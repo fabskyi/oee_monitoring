@@ -1,52 +1,69 @@
 <?php
 // ========== KONFIGURASI DATABASE ==========
-$host     = "localhost";          // biasanya localhost di shared hosting
-$user     = "root";               // ganti dengan user MySQL Anda
-$password = "";                   // ganti dengan password MySQL Anda
-$database = "oee_monitoring";     // sesuai database Anda
+$host     = "localhost";
+$user     = "root";
+$password = "";
+$database = "oee_monitoring";
 // ==========================================
 
 header("Content-Type: application/json");
 
-$conn = new mysqli($host, $user, $password, $database);
+// Koneksi
+$conn = mysqli_connect($host, $user, $password, $database);
 
-if ($conn->connect_error) {
+// Cek koneksi — kirim JSON jika gagal
+if (!$conn) {
     http_response_code(500);
-    echo json_encode(["status" => "error", "message" => $conn->connect_error]);
+    echo json_encode([
+        "status"   => "error",
+        "message"  => "Koneksi DB gagal: " . mysqli_connect_error(),
+        "db"       => $database
+    ]);
     exit;
 }
 
+// Kalau GET → hanya cek koneksi
+if ($_SERVER["REQUEST_METHOD"] === "GET") {
+    echo json_encode([
+        "status"   => "ok",
+        "message"  => "Koneksi DB berhasil",
+        "db"       => $database,
+        "server"   => $host
+    ]);
+    exit;
+}
+
+// ===== POST → simpan data dari ESP32 =====
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $device_id   = $conn->real_escape_string($_POST["device_id"]   ?? "ESP32-001");
+    $device_id   = mysqli_real_escape_string($conn, $_POST["device_id"]   ?? "ESP32-001");
     $temperature = floatval($_POST["temperature"] ?? 0);
     $humidity    = floatval($_POST["humidity"]    ?? 0);
     $voltage     = floatval($_POST["voltage"]     ?? 0);
     $current     = floatval($_POST["current"]     ?? 0);
     $counter     = intval($_POST["counter"]       ?? 0);
-    $status      = $conn->real_escape_string($_POST["status"] ?? "OFF");
+    $status      = mysqli_real_escape_string($conn, $_POST["status"] ?? "OFF");
 
     $sql = "INSERT INTO sensor_data
             (device_id, temperature, humidity, voltage, current, counter, status)
             VALUES
             ('$device_id', $temperature, $humidity, $voltage, $current, $counter, '$status')";
 
-    if ($conn->query($sql)) {
+    if (mysqli_query($conn, $sql)) {
         echo json_encode([
-            "status"  => "success",
+            "status"  => "ok",
             "message" => "Data tersimpan",
-            "id"      => $conn->insert_id
+            "id"      => mysqli_insert_id($conn),
+            "db"      => $database
         ]);
     } else {
         http_response_code(500);
-        echo json_encode(["status" => "error", "message" => $conn->error]);
+        echo json_encode([
+            "status"  => "error",
+            "message" => mysqli_error($conn),
+            "db"      => $database
+        ]);
     }
-} else {
-    // GET → tampilkan 10 data terakhir
-    $result = $conn->query("SELECT * FROM sensor_data ORDER BY created_at DESC LIMIT 10");
-    $rows = [];
-    while ($row = $result->fetch_assoc()) $rows[] = $row;
-    echo json_encode(["status" => "success", "data" => $rows]);
 }
 
-$conn->close();
+mysqli_close($conn);
 ?>
