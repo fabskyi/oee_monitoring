@@ -3,7 +3,7 @@
 $host     = "localhost";          // biasanya localhost di shared hosting
 $user     = "root";               // ganti dengan user MySQL Anda
 $password = "";                   // ganti dengan password MySQL Anda
-$database = "inventory_db_clone"; // sesuai database Anda
+$database = "oee_monitoring";     // sesuai database Anda
 // ==========================================
 
 header("Content-Type: application/json");
