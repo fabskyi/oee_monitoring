@@ -1,0 +1,24 @@
+{
+  "emptyTable": "Tidak ada data yang tersedia",
+  "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+  "infoEmpty": "Menampilkan 0 sampai 0 dari 0 entri",
+  "infoFiltered": "(disaring dari _MAX_ total entri)",
+  "infoThousands": ".",
+  "lengthMenu": "Tampilkan _MENU_ entri",
+  "loadingRecords": "Memuat...",
+  "processing": "Memproses...",
+  "search": "Cari:",
+  "zeroRecords": "Tidak ditemukan data yang sesuai",
+  "thousands": ".",
+  "decimal": ",",
+  "paginate": {
+    "first": "Pertama",
+    "last": "Terakhir",
+    "next": "Selanjutnya",
+    "previous": "Sebelumnya"
+  },
+  "aria": {
+    "sortAscending":  ": aktifkan untuk mengurutkan kolom secara ascending",
+    "sortDescending": ": aktifkan untuk mengurutkan kolom secara descending"
+  }
+}
