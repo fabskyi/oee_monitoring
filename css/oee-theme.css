@@ -1,0 +1,207 @@
+/* ============================================
+   OEE MONITORING SYSTEM - MAROON THEME
+   Override SB Admin 2 primary blue → maroon
+   ============================================ */
+
+:root {
+  --maroon:        #8B1A1A;
+  --maroon-dark:   #6B1010;
+  --maroon-light:  #B22222;
+  --maroon-pale:   #fdf0f0;
+  --maroon-mid:    #a02020;
+}
+
+/* ---- SIDEBAR ---- */
+.sidebar.sidebar-dark.bg-gradient-primary,
+.bg-gradient-primary,
+ul.sidebar,
+#accordionSidebar,
+.navbar-nav.sidebar {
+  background-color: var(--maroon) !important;
+  background-image: linear-gradient(180deg, #8B1A1A 10%, #6B1010 100%) !important;
+}
+
+/* Force override any inline style or specificity issue */
+html body #wrapper ul#accordionSidebar {
+  background-color: #8B1A1A !important;
+  background-image: linear-gradient(180deg, #8B1A1A 10%, #6B1010 100%) !important;
+}
+
+.sidebar .nav-item .nav-link:hover,
+.sidebar .nav-item.active .nav-link {
+  background-color: rgba(255,255,255,0.15) !important;
+}
+
+.sidebar .sidebar-brand {
+  background-color: rgba(0,0,0,0.15) !important;
+}
+
+.sidebar-divider { border-top-color: rgba(255,255,255,0.2) !important; }
+
+/* ---- BUTTONS ---- */
+.btn-primary {
+  background-color: var(--maroon) !important;
+  border-color: var(--maroon) !important;
+}
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+  background-color: var(--maroon-dark) !important;
+  border-color: var(--maroon-dark) !important;
+  box-shadow: 0 0 0 0.2rem rgba(139,26,26,0.35) !important;
+}
+
+/* ---- TEXT ---- */
+.text-primary { color: var(--maroon) !important; }
+a.text-primary:hover { color: var(--maroon-dark) !important; }
+
+/* ---- BORDERS & CARDS ---- */
+.border-left-primary { border-left: 0.25rem solid var(--maroon) !important; }
+.border-primary       { border-color: var(--maroon) !important; }
+
+/* ---- BADGES ---- */
+.badge-primary { background-color: var(--maroon) !important; }
+
+/* ---- PROGRESS BARS ---- */
+.progress-bar.bg-primary,
+.bg-primary { background-color: var(--maroon) !important; }
+
+/* ---- TOPBAR & LINKS ---- */
+a { color: var(--maroon); }
+a:hover { color: var(--maroon-dark); }
+.topbar .nav-item .nav-link:focus { background-color: var(--maroon-pale); }
+
+/* ---- FORM FOCUS ---- */
+.form-control:focus {
+  border-color: var(--maroon-light);
+  box-shadow: 0 0 0 0.2rem rgba(139,26,26,0.2);
+}
+
+/* ---- SCROLL TO TOP ---- */
+.scroll-to-top { background-color: var(--maroon) !important; }
+.scroll-to-top:hover { background-color: var(--maroon-dark) !important; }
+
+/* ---- PAGINATION ---- */
+.page-item.active .page-link {
+  background-color: var(--maroon) !important;
+  border-color: var(--maroon) !important;
+}
+.page-link { color: var(--maroon) !important; }
+.page-link:hover { color: var(--maroon-dark) !important; }
+
+/* ---- DROPDOWN ---- */
+.dropdown-item.active, .dropdown-item:active {
+  background-color: var(--maroon) !important;
+}
+
+/* ---- LOGIN PAGE ---- */
+body.bg-gradient-primary {
+  background-color: var(--maroon) !important;
+  background-image: linear-gradient(180deg, var(--maroon) 10%, var(--maroon-dark) 100%) !important;
+}
+.login-left-panel {
+  background: linear-gradient(135deg, #6B1010 0%, var(--maroon) 40%, var(--maroon-light) 100%) !important;
+}
+.btn-user.btn-primary { background-color: var(--maroon) !important; }
+
+/* ---- NAV TABS ---- */
+.nav-tabs .nav-link.active {
+  color: var(--maroon) !important;
+  border-bottom-color: var(--maroon) !important;
+}
+.nav-tabs .nav-link:hover { color: var(--maroon-dark) !important; }
+
+/* ---- CHECKBOXES & INPUTS ---- */
+.custom-control-input:checked ~ .custom-control-label::before {
+  background-color: var(--maroon) !important;
+  border-color: var(--maroon) !important;
+}
+
+/* ---- CHART.JS TOOLTIPS ---- */
+/* Handled via JS, no override needed */
+
+/* ---- CARD HEADER PRIMARY ---- */
+.card-header.bg-primary { background-color: var(--maroon) !important; }
+
+/* ---- ALERT/TOAST ---- */
+.alert-primary {
+  color: #4a0d0d;
+  background-color: #fde8e8;
+  border-color: #f5c6c6;
+}
+
+/* ---- TABLE HOVER ---- */
+.table-hover tbody tr:hover { background-color: #fdf0f0; }
+
+/* ---- SIDEBAR TOGGLE BUTTON ---- */
+#sidebarToggle, #sidebarToggleTop {
+  background-color: rgba(255,255,255,0.2) !important;
+}
+#sidebarToggle:hover, #sidebarToggleTop:hover {
+  background-color: rgba(255,255,255,0.35) !important;
+}
+
+/* ---- MISCELLANEOUS ---- */
+.icon-circle.bg-primary { background-color: var(--maroon) !important; }
+
+/* ---- FORCE OVERRIDE ALL BLUE VARIANTS ---- */
+/* SB Admin 2 uses these exact hex values for blue */
+[style*="#4e73df"], [style*="4e73df"] { color: var(--maroon) !important; }
+.bg-blue  { background-color: var(--maroon) !important; }
+
+/* Sidebar active item indicator */
+.sidebar .nav-item .nav-link.active::after,
+.sidebar .nav-item.active .nav-link::after {
+  border-right-color: var(--maroon-dark) !important;
+}
+
+/* DataTables info & pagination */
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+  background: var(--maroon) !important;
+  border-color: var(--maroon) !important;
+  color: #fff !important;
+}
+
+/* btn-info override → keep teal for info, but Detail buttons use btn-primary */
+/* Card border accents */
+.card .card-header { font-weight: 700; }
+
+/* Topbar search button */
+.topbar form .btn { background-color: var(--maroon) !important; border-color: var(--maroon) !important; }
+
+/* Active nav link in sidebar */
+.sidebar .nav-item .collapse .collapse-item:hover,
+.sidebar .nav-item .collapse .collapse-item.active {
+  color: var(--maroon) !important;
+}
+
+/* Sidebar brand icon */
+.sidebar-brand-icon i { color: rgba(255,255,255,0.9); }
+
+/* Status badges */
+.badge-run    { background-color: #1cc88a; color: #fff; padding: 4px 8px; border-radius: 4px; font-weight: 600; }
+.badge-stop   { background-color: #e74a3b; color: #fff; padding: 4px 8px; border-radius: 4px; font-weight: 600; }
+.badge-normal   { background-color: #1cc88a; }
+.badge-warning  { background-color: #f6c23e; color: #333; }
+.badge-critical { background-color: #e74a3b; }
+.animated--grow-in { animation-name: growIn; }
+
+/* Status indicator pulse (online devices) */
+.status-online { color: #1cc88a; }
+.status-offline { color: #e74a3b; }
+.pulse-dot {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+.pulse-dot.online  { background: #1cc88a; }
+.pulse-dot.offline { background: #e74a3b; }
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(28,200,138,0.6); }
+  70%  { box-shadow: 0 0 0 8px rgba(28,200,138,0); }
+  100% { box-shadow: 0 0 0 0 rgba(28,200,138,0); }
+}
+
+/* Hapus padding bawah yang disisakan sticky-footer */
+#content-wrapper { padding-bottom: 0 !important; }
+footer.sticky-footer { display: none !important; }

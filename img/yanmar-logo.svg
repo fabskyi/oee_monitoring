@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 175" fill="white">
+  <!-- Upper chevron — left arm -->
+  <polygon points="8,8 58,8 102,58 52,58"/>
+  <!-- Upper chevron — right arm -->
+  <polygon points="192,8 142,8 98,58 148,58"/>
+
+  <!-- Lower chevron — left arm -->
+  <polygon points="8,70 58,70 102,120 52,120"/>
+  <!-- Lower chevron — right arm -->
+  <polygon points="192,70 142,70 98,120 148,120"/>
+
+  <!-- YANMAR text -->
+  <text x="100" y="165" font-family="Arial Black, Impact, sans-serif" font-size="36" font-weight="900" text-anchor="middle" letter-spacing="2">YANMAR</text>
+</svg>
