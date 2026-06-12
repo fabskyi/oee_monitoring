@@ -208,6 +208,69 @@ switch ($action) {
         echo json_encode(['success'=>true,'sp_id'=>$newId], JSON_UNESCAPED_UNICODE);
         break;
 
+    // ── GET: latest production totals for a specific shift (ESP32 source) ──
+    // NOTE: This is a fallback mock/passthrough. If you have a real ESP32
+    // sensor table, replace the query below with your actual sensor read.
+    // Currently it reads from shift_production (same as manual save), which
+    // means it returns the last saved values — useful as a sync check.
+    case 'esp32_latest':
+        $mid     = (int)($_GET['machine_id'] ?? $input['machine_id'] ?? 0);
+        $shiftNo = (int)($_GET['shift_no']   ?? $input['shift_no']   ?? 0);
+        $date    = $_GET['date'] ?? $input['date'] ?? date('Y-m-d');
+
+        if (!$mid || !$shiftNo) {
+            echo json_encode(['success'=>false,'error'=>'machine_id and shift_no required']);
+            break;
+        }
+
+        // --- Attempt to read from a real sensor table (esp32_counters) if it exists ---
+        $hasSensorTable = false;
+        try {
+            $chk = $db->query("SELECT 1 FROM esp32_counters LIMIT 1");
+            $hasSensorTable = ($chk !== false);
+        } catch (Exception $e) { $hasSensorTable = false; }
+
+        if ($hasSensorTable) {
+            // Real sensor path: read latest row from esp32_counters
+            $stmt = $db->prepare("
+                SELECT total_out, total_reject, recorded_at
+                FROM esp32_counters
+                WHERE machine_id = ? AND shift_no = ? AND shift_date = ?
+                ORDER BY recorded_at DESC LIMIT 1
+            ");
+            $stmt->execute([$mid, $shiftNo, $date]);
+            $row = $stmt->fetch();
+            if ($row) {
+                echo json_encode(['success'=>true,'source'=>'esp32','data'=>[
+                    'total_out'    => (int)$row['total_out'],
+                    'total_reject' => (int)$row['total_reject'],
+                    'recorded_at'  => $row['recorded_at'],
+                ]], JSON_UNESCAPED_UNICODE);
+            } else {
+                echo json_encode(['success'=>false,'error'=>'No sensor data available']);
+            }
+        } else {
+            // Fallback mock: return last saved production values from shift_production
+            $stmt = $db->prepare("
+                SELECT total_out, total_reject, input_at AS recorded_at
+                FROM shift_production
+                WHERE machine_id = ? AND shift_no = ? AND shift_date = ?
+                LIMIT 1
+            ");
+            $stmt->execute([$mid, $shiftNo, $date]);
+            $row = $stmt->fetch();
+            if ($row) {
+                echo json_encode(['success'=>true,'source'=>'fallback_db','data'=>[
+                    'total_out'    => (int)$row['total_out'],
+                    'total_reject' => (int)$row['total_reject'],
+                    'recorded_at'  => $row['recorded_at'],
+                ]], JSON_UNESCAPED_UNICODE);
+            } else {
+                echo json_encode(['success'=>false,'error'=>'No sensor data available']);
+            }
+        }
+        break;
+
     default:
         echo json_encode(['success'=>false,'error'=>'Action tidak dikenal']);
 }

@@ -66,7 +66,7 @@ function handleLogin() {
     global $pdo;
 
     $stmt = $pdo->prepare(
-        "SELECT id, username, full_name, email, password_hash, role, is_active
+        "SELECT id, username, full_name, email, password_hash, role, is_active, avatar
          FROM users WHERE username = ? LIMIT 1"
     );
     $stmt->execute([$username]);
@@ -93,6 +93,7 @@ function handleLogin() {
     $_SESSION['username']  = $user['username'];
     $_SESSION['full_name'] = $user['full_name'];
     $_SESSION['role']      = $user['role'];
+    $_SESSION['avatar']    = $user['avatar'] ?? null;
 
     http_response_code(200);
     echo json_encode([
