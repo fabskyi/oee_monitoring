@@ -19,7 +19,7 @@ $currentUser = $_SESSION['username'] ?? 'User';
 $currentRole = $_SESSION['role'] ?? 'operator';
 ?>
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
@@ -42,10 +42,103 @@ $currentRole = $_SESSION['role'] ?? 'operator';
     <!-- OEE Maroon Theme Override (cache-bust: v3) -->
     <link href="css/oee-theme.css?v=3" rel="stylesheet">
 
-    <!-- jQuery HARUS load di HEAD agar tersedia untuk semua inline script -->
+    <!-- jQuery MUST be loaded in HEAD so it is available for all inline scripts -->
     <script src="vendor/jquery/jquery.min.js"></script>
 
     <style>
+        /* ── Sidebar: sticky + compact (collapsible toggle kept) ── */
+        /* SB Admin 2 sidebar is already position:fixed — stays on scroll */
+        /* Compact sizing only */
+        .sidebar .nav-item .nav-link { padding: 0.5rem 1rem; }
+        .sidebar .nav-item .nav-link span { font-size: .72rem; }
+        .sidebar .nav-item .nav-link i { font-size: .78rem; }
+        .sidebar .sidebar-heading { font-size: .54rem; padding: .6rem 1rem .2rem; }
+        .sidebar hr.sidebar-divider { margin: .35rem 0; }
+        .sidebar-brand { padding: .8rem 1rem !important; }
+        .sidebar-brand-text { font-size: .82rem !important; }
+        .sidebar .badge-counter-sidebar { font-size: .58rem; }
+        /* Toggle button style — keep visible */
+        #sidebarToggle { width: 2rem; height: 2rem; }
+        .text-center.d-none.d-md-inline { display: inline !important; }
+
+        /* ══ Topbar bell ════════════════════════════════════════ */
+        li.nav-item.dropdown.no-arrow.mx-1 > a.nav-link {
+            width: 38px; height: 38px; padding: 0;
+            border-radius: 50%; background: #f1f3f9; border: 1px solid #e3e6f0;
+            display: flex; align-items: center; justify-content: center;
+            color: #5a5c69; font-size: .88rem; position: relative;
+        }
+        li.nav-item.dropdown.no-arrow.mx-1 > a.nav-link:hover { background: #e2e6f0; }
+        li.nav-item.dropdown.no-arrow.mx-1 > a.nav-link::after { display: none; }
+        .tb-badge {
+            position: absolute; top: -3px; right: -3px;
+            background: #e74a3b; color: #fff; font-size: .5rem; font-weight: 800;
+            min-width: 16px; height: 16px; border-radius: 10px; padding: 0 4px;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #fff; line-height: 1;
+        }
+
+        /* ══ Alert dropdown ═════════════════════════════════════ */
+        .tb-alert-menu { min-width: 290px; border-radius: 14px; border: none; padding: 0; overflow: hidden; margin-top: 8px; }
+        .tb-drop-head {
+            display: flex; align-items: center; gap: 8px;
+            padding: 11px 14px; background: linear-gradient(135deg,#8B1A1A,#dc2626);
+            color: #fff; font-size: .76rem; font-weight: 700;
+        }
+        .tb-alert-item {
+            display: flex !important; align-items: center; gap: 11px;
+            padding: 11px 14px !important; transition: background .15s; color: #212529 !important;
+        }
+        .tb-alert-item:hover { background: #fff8f8 !important; }
+        .tb-alert-icon { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: .85rem; }
+        .tb-alert-body { flex: 1; min-width: 0; }
+        .tb-alert-title { font-size: .78rem; font-weight: 700; }
+        .tb-alert-sub   { font-size: .66rem; color: #858796; margin-top: 1px; }
+        .tb-alert-empty { padding: 18px 14px; text-align: center; color: #858796; font-size: .76rem; }
+        .tb-drop-footer { text-align: center; padding: 7px; background: #f8f9fa; border-top: 1px solid #f1f3f5; font-size: .7rem; }
+        .tb-drop-footer a { color: #8B1A1A; font-weight: 700; text-decoration: none; }
+
+        /* ══ Topbar user pill ═══════════════════════════════════ */
+        .topbar-user-card {
+            display: flex; align-items: center; gap: 8px;
+            padding: 4px 12px 4px 5px; border-radius: 50px;
+            background: #f8f9fc; border: 1px solid #e3e6f0;
+            text-decoration: none; transition: background .18s;
+        }
+        .topbar-user-card:hover  { background: #eaecf4; text-decoration: none; }
+        .topbar-user-card::after { display: none; }
+        .tb-av-wrap { position: relative; flex-shrink: 0; }
+        .topbar-user-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            object-fit: cover; border: 2px solid #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,.18); display: block;
+        }
+        .tb-av-online {
+            position: absolute; bottom: 0; right: 0;
+            width: 9px; height: 9px; border-radius: 50%;
+            background: #1cc88a; border: 2px solid #fff;
+        }
+        .topbar-user-info { line-height: 1.2; }
+        .topbar-user-name { font-size: .78rem; font-weight: 700; color: #3a3b45; display: block; white-space: nowrap; }
+        .topbar-user-role { font-size: .63rem; color: #858796; display: block; }
+        .topbar-divider   { width: 0; border-right: 1px solid #e3e6f0; height: 28px; margin: 0 6px; align-self: center; }
+
+        /* ══ User dropdown ══════════════════════════════════════ */
+        .tb-user-menu { min-width: 210px; border-radius: 14px; border: none; padding: 0; overflow: hidden; margin-top: 8px; }
+        .tb-user-drop-head { display: flex; align-items: center; gap: 11px; padding: 14px; background: linear-gradient(135deg,#8B1A1A,#dc2626); }
+        .tb-udh-av-wrap { position: relative; flex-shrink: 0; }
+        .tb-udh-av { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,.45); display: block; }
+        .tb-udh-online { position: absolute; bottom: 1px; right: 1px; width: 10px; height: 10px; border-radius: 50%; background: #4ade80; border: 2px solid #fff; }
+        .tb-udh-name { font-size: .84rem; font-weight: 800; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tb-role-badge { display: inline-block; margin-top: 4px; font-size: .58rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; background: rgba(255,255,255,.2); color: #fff; text-transform: uppercase; letter-spacing: .3px; }
+        .tb-drop-item { display: flex !important; align-items: center; gap: 9px; padding: 9px 14px !important; font-size: .8rem; color: #3a3b45 !important; transition: background .15s; }
+        .tb-drop-item:hover { background: #f8f9fa !important; }
+        .tb-di-icon { width: 28px; height: 28px; border-radius: 7px; background: #f1f3f5; display: flex; align-items: center; justify-content: center; font-size: .75rem; color: #6c757d; flex-shrink: 0; }
+        .tb-drop-item:hover .tb-di-icon { background: #e9ecef; }
+        .tb-drop-logout { color: #dc2626 !important; }
+        .tb-drop-logout .tb-di-icon { background: #fef2f2; color: #dc2626; }
+        .tb-drop-logout:hover { background: #fff5f5 !important; }
+
         /* Status Indicators */
         .status-dot {
             display: inline-block;
@@ -159,8 +252,8 @@ $currentRole = $_SESSION['role'] ?? 'operator';
 
         <!-- Sidebar - Brand -->
         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php">
-            <div class="sidebar-brand-icon rotate-n-15">
-                <i class="fas fa-cog"></i>
+            <div class="sidebar-brand-icon" style="background:transparent;width:36px;height:36px;">
+                <img src="img/yanmar.png" alt="Yanmar" style="width:36px;height:36px;object-fit:contain;filter:brightness(0) invert(1);">
             </div>
             <div class="sidebar-brand-text mx-3">OEE Monitoring</div>
         </a>
@@ -184,11 +277,11 @@ $currentRole = $_SESSION['role'] ?? 'operator';
             Monitoring
         </div>
 
-        <!-- Nav Item - Status Mesin -->
+        <!-- Nav Item - Machine Status -->
         <li class="nav-item <?php echo ($currentPage === 'machines') ? 'active' : ''; ?>">
             <a class="nav-link" href="machines.php">
                 <i class="fas fa-fw fa-cogs"></i>
-                <span>Status Mesin</span>
+                <span>Machine Status</span>
             </a>
         </li>
 
@@ -197,6 +290,14 @@ $currentRole = $_SESSION['role'] ?? 'operator';
             <a class="nav-link" href="esp32_monitor.php">
                 <i class="fas fa-fw fa-broadcast-tower"></i>
                 <span>ESP32 Monitor</span>
+            </a>
+        </li>
+
+        <!-- Nav Item - ESP32 Config -->
+        <li class="nav-item <?php echo ($currentPage === 'esp32_config') ? 'active' : ''; ?>">
+            <a class="nav-link" href="esp32_config.php">
+                <i class="fas fa-fw fa-sliders-h"></i>
+                <span>ESP32 Config</span>
             </a>
         </li>
 
@@ -212,24 +313,24 @@ $currentRole = $_SESSION['role'] ?? 'operator';
         <!-- Divider -->
         <hr class="sidebar-divider">
 
-        <!-- Heading - ANALISIS -->
+        <!-- Heading - ANALYSIS -->
         <div class="sidebar-heading">
-            Analisis
+            Analysis
         </div>
 
-        <!-- Nav Item - Detail Mesin -->
+        <!-- Nav Item - Machine Detail -->
         <li class="nav-item <?php echo ($currentPage === 'machine_detail') ? 'active' : ''; ?>">
             <a class="nav-link" href="machine_detail.php">
                 <i class="fas fa-fw fa-microscope"></i>
-                <span>Detail Mesin</span>
+                <span>Machine Detail</span>
             </a>
         </li>
 
-        <!-- Nav Item - Analisis Vibrasi (+ Portable Monitor) -->
+        <!-- Nav Item - Vibration Analysis (+ Portable Monitor) -->
         <li class="nav-item <?php echo in_array($currentPage, ['vibration','vibration_portable']) ? 'active' : ''; ?>">
             <a class="nav-link" href="vibration.php">
                 <i class="fas fa-fw fa-wave-square"></i>
-                <span>Analisis Vibrasi</span>
+                <span>Vibration Analysis</span>
                 <span class="badge badge-primary ml-1" style="font-size:.55rem;">+Portable</span>
             </a>
         </li>
@@ -242,20 +343,20 @@ $currentRole = $_SESSION['role'] ?? 'operator';
             </a>
         </li>
 
-        <!-- Nav Item - Laporan Energi -->
+        <!-- Nav Item - Energy Report -->
         <li class="nav-item <?php echo ($currentPage === 'energy') ? 'active' : ''; ?>">
             <a class="nav-link" href="energy.php">
                 <i class="fas fa-fw fa-bolt"></i>
-                <span>Laporan Energi</span>
+                <span>Energy Report</span>
             </a>
         </li>
 
         <!-- Divider -->
         <hr class="sidebar-divider">
 
-        <!-- Heading - MANAJEMEN -->
+        <!-- Heading - MANAGEMENT -->
         <div class="sidebar-heading">
-            Manajemen
+            Management
         </div>
 
         <!-- Nav Item - Alerts -->
@@ -277,11 +378,11 @@ $currentRole = $_SESSION['role'] ?? 'operator';
             </a>
         </li>
 
-        <!-- Nav Item - Laporan & Export -->
+        <!-- Nav Item - Reports & Export -->
         <li class="nav-item <?php echo ($currentPage === 'reports') ? 'active' : ''; ?>">
             <a class="nav-link" href="reports.php">
                 <i class="fas fa-fw fa-file-export"></i>
-                <span>Laporan &amp; Export</span>
+                <span>Reports &amp; Export</span>
             </a>
         </li>
 
@@ -294,19 +395,19 @@ $currentRole = $_SESSION['role'] ?? 'operator';
             Admin
         </div>
 
-        <!-- Nav Item - Pengguna -->
+        <!-- Nav Item - Users -->
         <li class="nav-item <?php echo ($currentPage === 'users') ? 'active' : ''; ?>">
             <a class="nav-link" href="users.php">
                 <i class="fas fa-fw fa-users"></i>
-                <span>Pengguna</span>
+                <span>Users</span>
             </a>
         </li>
 
-        <!-- Nav Item - Pengaturan -->
+        <!-- Nav Item - Settings -->
         <li class="nav-item <?php echo ($currentPage === 'settings') ? 'active' : ''; ?>">
             <a class="nav-link" href="settings.php">
                 <i class="fas fa-fw fa-cog"></i>
-                <span>Pengaturan</span>
+                <span>Settings</span>
             </a>
         </li>
         <?php endif; ?>
@@ -336,104 +437,95 @@ $currentRole = $_SESSION['role'] ?? 'operator';
                     <i class="fa fa-bars"></i>
                 </button>
 
-                <!-- Topbar Search -->
-                <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-                    <div class="input-group">
-                        <input type="text" class="form-control bg-light border-0 small" placeholder="Cari mesin, alert..." aria-label="Search" aria-describedby="basic-addon2">
-                        <div class="input-group-append">
-                            <button class="btn btn-primary" type="button">
-                                <i class="fas fa-search fa-sm"></i>
-                            </button>
-                        </div>
-                    </div>
-                </form>
 
                 <!-- Topbar Navbar -->
                 <ul class="navbar-nav ml-auto">
 
-                    <!-- Nav Item - Search Dropdown (Visible Only XS) -->
-                    <li class="nav-item dropdown no-arrow d-sm-none">
-                        <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-search fa-fw"></i>
-                        </a>
-                        <!-- Dropdown - Messages -->
-                        <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
-                            <form class="form-inline mr-auto w-100 navbar-search">
-                                <div class="input-group">
-                                    <input type="text" class="form-control bg-light border-0 small" placeholder="Cari..." aria-label="Search" aria-describedby="basic-addon2">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary" type="button">
-                                            <i class="fas fa-search fa-sm"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </li>
 
                     <!-- Nav Item - Alerts -->
                     <li class="nav-item dropdown no-arrow mx-1">
-                        <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-bell fa-fw"></i>
+                        <a class="nav-link tb-icon-btn" href="#" id="alertsDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-bell"></i>
                             <?php if ($unreadAlertCount > 0): ?>
-                                <span class="badge badge-danger badge-counter"><?php echo $unreadAlertCount > 99 ? '99+' : $unreadAlertCount; ?></span>
+                                <span class="tb-badge"><?php echo $unreadAlertCount > 99 ? '99+' : $unreadAlertCount; ?></span>
                             <?php endif; ?>
                         </a>
-                        <!-- Dropdown - Alerts -->
-                        <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">
-                            <h6 class="dropdown-header">
-                                Alert Center
-                            </h6>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in tb-alert-menu" aria-labelledby="alertsDropdown">
+                            <div class="tb-drop-head">
+                                <i class="fas fa-bell mr-2"></i>Alert Center
+                                <?php if ($unreadAlertCount > 0): ?>
+                                    <span class="badge badge-danger ml-auto" style="font-size:.6rem;"><?php echo $unreadAlertCount; ?> unread</span>
+                                <?php endif; ?>
+                            </div>
                             <?php if ($unreadAlertCount > 0): ?>
-                                <a class="dropdown-item d-flex align-items-center" href="alerts.php">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-danger">
-                                            <i class="fas fa-bell text-white"></i>
-                                        </div>
+                                <a class="dropdown-item tb-alert-item" href="alerts.php">
+                                    <div class="tb-alert-icon bg-danger"><i class="fas fa-exclamation text-white"></i></div>
+                                    <div class="tb-alert-body">
+                                        <div class="tb-alert-title"><?php echo $unreadAlertCount; ?> alert<?php echo $unreadAlertCount > 1 ? 's' : ''; ?> perlu ditinjau</div>
+                                        <div class="tb-alert-sub">Klik untuk melihat detail</div>
                                     </div>
-                                    <div>
-                                        <div class="small text-gray-500">Belum Dibaca</div>
-                                        <span class="font-weight-bold"><?php echo $unreadAlertCount; ?> alert menunggu perhatian</span>
-                                    </div>
+                                    <i class="fas fa-chevron-right tb-alert-arrow"></i>
                                 </a>
                             <?php else: ?>
-                                <a class="dropdown-item text-center small text-gray-500" href="alerts.php">Tidak ada alert baru</a>
+                                <div class="tb-alert-empty">
+                                    <i class="fas fa-check-circle text-success mb-2" style="font-size:1.5rem;"></i><br>
+                                    Tidak ada alert baru
+                                </div>
                             <?php endif; ?>
-                            <a class="dropdown-item text-center small text-gray-500" href="alerts.php">Lihat Semua Alert</a>
+                            <div class="tb-drop-footer"><a href="alerts.php">Lihat Semua Alert <i class="fas fa-arrow-right ml-1"></i></a></div>
                         </div>
                     </li>
 
                     <div class="topbar-divider d-none d-sm-block"></div>
 
                     <!-- Nav Item - User Information -->
+                    <?php $tbUid = (int)($_SESSION['user_id'] ?? 0); ?>
                     <li class="nav-item dropdown no-arrow">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">
-                                <?php echo htmlspecialchars($currentUser); ?>
-                                <br>
-                                <small class="text-gray-400"><?php echo htmlspecialchars(ucfirst($currentRole)); ?></small>
-                            </span>
-                            <img class="img-profile rounded-circle" src="img/undraw_profile.svg" alt="User">
-                        </a>
-                        <!-- Dropdown - User Information -->
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                            <div class="dropdown-header text-center">
-                                <strong><?php echo htmlspecialchars($currentUser); ?></strong><br>
-                                <small class="text-muted"><?php echo htmlspecialchars(ucfirst($currentRole)); ?></small>
+                        <a class="topbar-user-card dropdown-toggle" href="#" id="userDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <div class="tb-av-wrap">
+                                <img class="topbar-user-avatar" id="tbUserAv"
+                                     src="api/avatar.php?id=<?php echo $tbUid; ?>&v=<?php echo time(); ?>"
+                                     alt="<?php echo htmlspecialchars($currentUser); ?>"
+                                     onerror="this.src='img/undraw_profile.svg'">
+                                <span class="tb-av-online"></span>
                             </div>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="profile.php">
-                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Profil
+                            <div class="topbar-user-info d-none d-lg-block">
+                                <span class="topbar-user-name"><?php echo htmlspecialchars($currentUser); ?></span>
+                                <span class="topbar-user-role"><?php echo htmlspecialchars(ucfirst($currentRole)); ?></span>
+                            </div>
+                        </a>
+                        <!-- Dropdown -->
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in tb-user-menu" aria-labelledby="userDropdown">
+                            <!-- Profile header -->
+                            <div class="tb-user-drop-head">
+                                <div class="tb-udh-av-wrap">
+                                    <img class="tb-udh-av"
+                                         src="api/avatar.php?id=<?php echo $tbUid; ?>&v=<?php echo time(); ?>"
+                                         alt="" onerror="this.src='img/undraw_profile.svg'">
+                                    <span class="tb-udh-online"></span>
+                                </div>
+                                <div class="tb-udh-info">
+                                    <div class="tb-udh-name"><?php echo htmlspecialchars($currentUser); ?></div>
+                                    <div class="tb-udh-role">
+                                        <span class="tb-role-badge"><?php echo htmlspecialchars(ucfirst($currentRole)); ?></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dropdown-divider m-0"></div>
+                            <a class="dropdown-item tb-drop-item" href="profile.php">
+                                <span class="tb-di-icon"><i class="fas fa-user-circle"></i></span>
+                                <span>Profile</span>
                             </a>
-                            <a class="dropdown-item" href="settings.php">
-                                <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Pengaturan
+                            <a class="dropdown-item tb-drop-item" href="settings.php">
+                                <span class="tb-di-icon"><i class="fas fa-sliders-h"></i></span>
+                                <span>Settings</span>
                             </a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="logout.php">
-                                <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Logout
+                            <div class="dropdown-divider m-0"></div>
+                            <a class="dropdown-item tb-drop-item tb-drop-logout" href="logout.php">
+                                <span class="tb-di-icon"><i class="fas fa-sign-out-alt"></i></span>
+                                <span>Logout</span>
                             </a>
                         </div>
                     </li>
