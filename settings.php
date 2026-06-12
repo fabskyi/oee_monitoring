@@ -66,7 +66,7 @@ require_once 'includes/header.php';
 
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-cog mr-2"></i>Pengaturan Sistem</h1>
+    <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-cog mr-2"></i>System Settings</h1>
 </div>
 
 <!-- Toast notification -->
@@ -75,16 +75,16 @@ require_once 'includes/header.php';
 <!-- Nav Tabs -->
 <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
     <li class="nav-item">
-        <a class="nav-link active" id="tab-umum"      data-toggle="tab" href="#pane-umum"      role="tab"><i class="fas fa-sliders-h mr-1"></i>Umum</a>
+        <a class="nav-link active" id="tab-umum"      data-toggle="tab" href="#pane-umum"      role="tab"><i class="fas fa-sliders-h mr-1"></i>General</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link"        id="tab-oee"       data-toggle="tab" href="#pane-oee"       role="tab"><i class="fas fa-bullseye mr-1"></i>Target OEE</a>
+        <a class="nav-link"        id="tab-oee"       data-toggle="tab" href="#pane-oee"       role="tab"><i class="fas fa-bullseye mr-1"></i>OEE Target</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link"        id="tab-threshold" data-toggle="tab" href="#pane-threshold" role="tab"><i class="fas fa-thermometer-half mr-1"></i>Threshold Sensor</a>
+        <a class="nav-link"        id="tab-threshold" data-toggle="tab" href="#pane-threshold" role="tab"><i class="fas fa-thermometer-half mr-1"></i>Sensor Threshold</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link"        id="tab-vibrasi"   data-toggle="tab" href="#pane-vibrasi"   role="tab"><i class="fas fa-wave-square mr-1"></i>Vibrasi</a>
+        <a class="nav-link"        id="tab-vibrasi"   data-toggle="tab" href="#pane-vibrasi"   role="tab"><i class="fas fa-wave-square mr-1"></i>Vibration</a>
     </li>
     <li class="nav-item">
         <a class="nav-link"        id="tab-esp32"     data-toggle="tab" href="#pane-esp32"     role="tab"><i class="fas fa-broadcast-tower mr-1"></i>ESP32 &amp; MQTT</a>
@@ -98,18 +98,18 @@ require_once 'includes/header.php';
 
     <!-- ============================================================ TAB 1: UMUM -->
     <div class="tab-pane fade show active" id="pane-umum" role="tabpanel">
-        <h5 class="text-primary mb-3"><i class="fas fa-sliders-h mr-2"></i>Pengaturan Umum</h5>
+        <h5 class="text-primary mb-3"><i class="fas fa-sliders-h mr-2"></i>General Settings</h5>
         <form id="formUmum">
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label for="site_name">Nama Situs</label>
+                        <label for="site_name">Site Name</label>
                         <input type="text" class="form-control" id="site_name" name="site_name" value="<?php echo $siteName; ?>" placeholder="OEE Monitoring System">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label for="company_name">Nama Perusahaan</label>
+                        <label for="company_name">Company Name</label>
                         <input type="text" class="form-control" id="company_name" name="company_name" value="<?php echo $companyName; ?>" placeholder="PT. YADIN">
                     </div>
                 </div>
@@ -117,20 +117,20 @@ require_once 'includes/header.php';
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="data_retention_days">Retensi Data (hari)</label>
+                        <label for="data_retention_days">Data Retention (days)</label>
                         <input type="number" class="form-control" id="data_retention_days" name="data_retention_days" value="<?php echo $retentionDays; ?>" min="1" max="3650">
-                        <small class="form-text text-muted">Data lebih lama dari nilai ini akan dibersihkan.</small>
+                        <small class="form-text text-muted">Data older than this value will be cleaned up.</small>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="auto_refresh_interval">Interval Auto Refresh (detik)</label>
+                        <label for="auto_refresh_interval">Auto Refresh Interval (seconds)</label>
                         <input type="number" class="form-control" id="auto_refresh_interval" name="auto_refresh_interval" value="<?php echo $refreshInterval; ?>" min="5" max="3600">
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="timezone">Zona Waktu</label>
+                        <label for="timezone">Time Zone</label>
                         <select class="form-control" id="timezone" name="timezone">
                             <?php foreach ($timezones as $tz): ?>
                             <option value="<?php echo $tz; ?>" <?php echo $timezone===$tz?'selected':''; ?>><?php echo $tz; ?></option>
@@ -140,14 +140,14 @@ require_once 'includes/header.php';
                 </div>
             </div>
             <button type="button" class="btn btn-primary" id="btnSaveUmum">
-                <i class="fas fa-save mr-1"></i>Simpan Pengaturan Umum
+                <i class="fas fa-save mr-1"></i>Save General Settings
             </button>
         </form>
     </div>
 
     <!-- ============================================================ TAB 2: TARGET OEE -->
     <div class="tab-pane fade" id="pane-oee" role="tabpanel">
-        <h5 class="text-primary mb-3"><i class="fas fa-bullseye mr-2"></i>Target OEE Global</h5>
+        <h5 class="text-primary mb-3"><i class="fas fa-bullseye mr-2"></i>Global OEE Target</h5>
         <div class="row mb-4">
             <!-- Gauge preview -->
             <div class="col-md-3 text-center">
@@ -187,22 +187,22 @@ require_once 'includes/header.php';
                 </div>
                 <?php endforeach; ?>
                 <button type="button" class="btn btn-primary mt-2" id="btnSaveOeeGlobal">
-                    <i class="fas fa-save mr-1"></i>Simpan Target Global
+                    <i class="fas fa-save mr-1"></i>Save Global Target
                 </button>
             </div>
         </div>
 
         <!-- Per-machine OEE -->
-        <h6 class="text-secondary mb-2"><i class="fas fa-cogs mr-1"></i>Target OEE Per Mesin</h6>
+        <h6 class="text-secondary mb-2"><i class="fas fa-cogs mr-1"></i>OEE Target Per Machine</h6>
         <div class="table-responsive">
             <table class="table table-bordered table-sm">
                 <thead class="thead-light">
                     <tr>
-                        <th>Mesin</th>
+                        <th>Machine</th>
                         <th>Availability %</th>
                         <th>Performance %</th>
                         <th>Quality %</th>
-                        <th>Aksi</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -220,13 +220,13 @@ require_once 'includes/header.php';
                     <td><input type="number" class="form-control form-control-sm machine-qual"  value="<?php echo $ql; ?>" min="0" max="100"></td>
                     <td>
                         <button class="btn btn-sm btn-success btnSaveMachineOee" data-machine-id="<?php echo $mid; ?>">
-                            <i class="fas fa-save"></i> Simpan
+                            <i class="fas fa-save"></i> Save
                         </button>
                     </td>
                 </tr>
                 <?php endforeach; ?>
                 <?php if (empty($machines)): ?>
-                <tr><td colspan="5" class="text-center text-muted">Tidak ada data mesin.</td></tr>
+                <tr><td colspan="5" class="text-center text-muted">No machine data available.</td></tr>
                 <?php endif; ?>
                 </tbody>
             </table>
@@ -235,16 +235,16 @@ require_once 'includes/header.php';
 
     <!-- ============================================================ TAB 3: THRESHOLD SENSOR -->
     <div class="tab-pane fade" id="pane-threshold" role="tabpanel">
-        <h5 class="text-primary mb-3"><i class="fas fa-thermometer-half mr-2"></i>Threshold Sensor</h5>
+        <h5 class="text-primary mb-3"><i class="fas fa-thermometer-half mr-2"></i>Sensor Threshold</h5>
         <div class="table-responsive">
             <table class="table table-bordered table-hover" id="tblThreshold">
                 <thead class="thead-light">
                     <tr>
-                        <th>Mesin</th>
+                        <th>Machine</th>
                         <th>Sensor Key</th>
-                        <th>Batas Bawah (Lo)</th>
-                        <th>Batas Atas (Hi)</th>
-                        <th>Aksi</th>
+                        <th>Lower Limit (Lo)</th>
+                        <th>Upper Limit (Hi)</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -262,7 +262,7 @@ require_once 'includes/header.php';
                     </td>
                     <td>
                         <button class="btn btn-sm btn-warning btn-edit-thresh"><i class="fas fa-edit"></i> Edit</button>
-                        <button class="btn btn-sm btn-success btn-save-thresh d-none"><i class="fas fa-check"></i> Simpan</button>
+                        <button class="btn btn-sm btn-success btn-save-thresh d-none"><i class="fas fa-check"></i> Save</button>
                         <button class="btn btn-sm btn-secondary btn-cancel-thresh d-none"><i class="fas fa-times"></i></button>
                         <button class="btn btn-sm btn-outline-secondary btn-reset-thresh ml-1" data-machine-id="<?php echo $t['machine_id']; ?>">
                             <i class="fas fa-undo"></i> Reset
@@ -271,7 +271,7 @@ require_once 'includes/header.php';
                 </tr>
                 <?php endforeach; ?>
                 <?php if (empty($thresholds)): ?>
-                <tr><td colspan="5" class="text-center text-muted">Tidak ada data threshold.</td></tr>
+                <tr><td colspan="5" class="text-center text-muted">No threshold data available.</td></tr>
                 <?php endif; ?>
                 </tbody>
             </table>
@@ -280,46 +280,46 @@ require_once 'includes/header.php';
 
     <!-- ============================================================ TAB 4: VIBRASI -->
     <div class="tab-pane fade" id="pane-vibrasi" role="tabpanel">
-        <h5 class="text-primary mb-3"><i class="fas fa-wave-square mr-2"></i>Pengaturan Vibrasi</h5>
+        <h5 class="text-primary mb-3"><i class="fas fa-wave-square mr-2"></i>Vibration Settings</h5>
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="vibration_warning">Ambang Peringatan (mm/s)</label>
+                    <label for="vibration_warning">Warning Threshold (mm/s)</label>
                     <input type="number" class="form-control" id="vibration_warning" name="vibration_warning" value="<?php echo $vibWarn; ?>" step="0.1" min="0">
-                    <small class="form-text text-muted">Nilai default: 2.8 mm/s — zona peringatan dimulai di sini.</small>
+                    <small class="form-text text-muted">Default: 2.8 mm/s — warning zone starts here.</small>
                 </div>
                 <div class="form-group">
-                    <label for="vibration_critical">Ambang Kritis (mm/s)</label>
+                    <label for="vibration_critical">Critical Threshold (mm/s)</label>
                     <input type="number" class="form-control" id="vibration_critical" name="vibration_critical" value="<?php echo $vibCrit; ?>" step="0.1" min="0">
-                    <small class="form-text text-muted">Nilai default: 7.1 mm/s — zona berbahaya di atas nilai ini.</small>
+                    <small class="form-text text-muted">Default: 7.1 mm/s — danger zone above this value.</small>
                 </div>
                 <button type="button" class="btn btn-primary" id="btnSaveVibrasi">
-                    <i class="fas fa-save mr-1"></i>Simpan Pengaturan Vibrasi
+                    <i class="fas fa-save mr-1"></i>Save Vibration Settings
                 </button>
             </div>
             <div class="col-md-6">
-                <label>Zona Vibrasi (0 – 15 mm/s)</label>
+                <label>Vibration Zone (0 – 15 mm/s)</label>
                 <div id="vibZoneBar" style="width:100%;height:40px;border-radius:6px;overflow:hidden;position:relative;border:1px solid #ccc;"></div>
                 <div class="d-flex justify-content-between mt-1 small text-muted">
                     <span>0</span><span>5</span><span>10</span><span>15 mm/s</span>
                 </div>
                 <div class="mt-3">
-                    <span class="badge" style="background:#1cc88a;color:#fff;padding:6px 12px;">Aman</span>
-                    <span class="badge" style="background:#f6c23e;color:#fff;padding:6px 12px;">Peringatan</span>
-                    <span class="badge" style="background:#e74a3b;color:#fff;padding:6px 12px;">Kritis</span>
+                    <span class="badge" style="background:#1cc88a;color:#fff;padding:6px 12px;">Safe</span>
+                    <span class="badge" style="background:#f6c23e;color:#fff;padding:6px 12px;">Warning</span>
+                    <span class="badge" style="background:#e74a3b;color:#fff;padding:6px 12px;">Critical</span>
                 </div>
 
                 <!-- ISO 10816 Reference -->
-                <h6 class="mt-4 text-secondary">Referensi ISO 10816</h6>
+                <h6 class="mt-4 text-secondary">ISO 10816 Reference</h6>
                 <table class="table table-bordered table-sm small">
                     <thead class="thead-light">
-                        <tr><th>Kelas</th><th>Deskripsi</th><th>Baik</th><th>Diterima</th><th>Peringatan</th><th>Tidak Diterima</th></tr>
+                        <tr><th>Class</th><th>Description</th><th>Good</th><th>Acceptable</th><th>Warning</th><th>Unacceptable</th></tr>
                     </thead>
                     <tbody>
-                        <tr><td>I</td><td>Mesin kecil &lt;15 kW</td><td>&lt;0.71</td><td>0.71–1.8</td><td>1.8–4.5</td><td>&gt;4.5</td></tr>
-                        <tr><td>II</td><td>Mesin medium 15–75 kW</td><td>&lt;1.12</td><td>1.12–2.8</td><td>2.8–7.1</td><td>&gt;7.1</td></tr>
-                        <tr><td>III</td><td>Mesin besar kaku &gt;75 kW</td><td>&lt;1.8</td><td>1.8–4.5</td><td>4.5–11.2</td><td>&gt;11.2</td></tr>
-                        <tr><td>IV</td><td>Mesin besar fleksibel &gt;75 kW</td><td>&lt;2.8</td><td>2.8–7.1</td><td>7.1–18</td><td>&gt;18</td></tr>
+                        <tr><td>I</td><td>Small machines &lt;15 kW</td><td>&lt;0.71</td><td>0.71–1.8</td><td>1.8–4.5</td><td>&gt;4.5</td></tr>
+                        <tr><td>II</td><td>Medium machines 15–75 kW</td><td>&lt;1.12</td><td>1.12–2.8</td><td>2.8–7.1</td><td>&gt;7.1</td></tr>
+                        <tr><td>III</td><td>Large rigid machines &gt;75 kW</td><td>&lt;1.8</td><td>1.8–4.5</td><td>4.5–11.2</td><td>&gt;11.2</td></tr>
+                        <tr><td>IV</td><td>Large flexible machines &gt;75 kW</td><td>&lt;2.8</td><td>2.8–7.1</td><td>7.1–18</td><td>&gt;18</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -328,7 +328,7 @@ require_once 'includes/header.php';
 
     <!-- ============================================================ TAB 5: ESP32 & MQTT -->
     <div class="tab-pane fade" id="pane-esp32" role="tabpanel">
-        <h5 class="text-primary mb-3"><i class="fas fa-broadcast-tower mr-2"></i>Konfigurasi ESP32 &amp; MQTT</h5>
+        <h5 class="text-primary mb-3"><i class="fas fa-broadcast-tower mr-2"></i>ESP32 &amp; MQTT Configuration</h5>
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
@@ -344,34 +344,34 @@ require_once 'includes/header.php';
                     <input type="text" class="form-control" id="mqtt_topic_prefix" name="mqtt_topic_prefix" value="<?php echo $mqttTopicPrefix; ?>" placeholder="oee/">
                 </div>
                 <div class="form-group">
-                    <label for="esp32_data_interval">Interval Data ESP32</label>
+                    <label for="esp32_data_interval">ESP32 Data Interval</label>
                     <select class="form-control" id="esp32_data_interval" name="esp32_data_interval">
                         <?php foreach ([1,3,5,10] as $sec): ?>
-                        <option value="<?php echo $sec; ?>" <?php echo $esp32Interval==$sec?'selected':''; ?>><?php echo $sec; ?> detik</option>
+                        <option value="<?php echo $sec; ?>" <?php echo $esp32Interval==$sec?'selected':''; ?>><?php echo $sec; ?> seconds</option>
                         <?php endforeach; ?>
                     </select>
                 </div>
                 <button type="button" class="btn btn-primary mr-2" id="btnSaveEsp32">
-                    <i class="fas fa-save mr-1"></i>Simpan
+                    <i class="fas fa-save mr-1"></i>Save
                 </button>
                 <button type="button" class="btn btn-info" id="btnTestKoneksi">
-                    <i class="fas fa-plug mr-1"></i>Test Koneksi
+                    <i class="fas fa-plug mr-1"></i>Test Connection
                 </button>
                 <span id="koneksiResult" class="ml-2"></span>
             </div>
         </div>
 
         <!-- ESP32 Devices Table -->
-        <h6 class="text-secondary mt-4 mb-2"><i class="fas fa-microchip mr-1"></i>Daftar Perangkat ESP32</h6>
+        <h6 class="text-secondary mt-4 mb-2"><i class="fas fa-microchip mr-1"></i>ESP32 Device List</h6>
         <div class="table-responsive">
             <table class="table table-bordered table-hover table-sm">
                 <thead class="thead-light">
                     <tr>
                         <th>Device ID</th>
-                        <th>Mesin</th>
+                        <th>Machine</th>
                         <th>IP Address</th>
                         <th>Status</th>
-                        <th>Terakhir Terlihat</th>
+                        <th>Last Seen</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -391,7 +391,7 @@ require_once 'includes/header.php';
                 </tr>
                 <?php endforeach; ?>
                 <?php if (empty($esp32Devices)): ?>
-                <tr><td colspan="5" class="text-center text-muted">Tidak ada perangkat ESP32 terdaftar.</td></tr>
+                <tr><td colspan="5" class="text-center text-muted">No ESP32 devices registered.</td></tr>
                 <?php endif; ?>
                 </tbody>
             </table>
@@ -400,18 +400,18 @@ require_once 'includes/header.php';
 
     <!-- ============================================================ TAB 6: DATABASE -->
     <div class="tab-pane fade" id="pane-database" role="tabpanel">
-        <h5 class="text-primary mb-3"><i class="fas fa-database mr-2"></i>Manajemen Database</h5>
+        <h5 class="text-primary mb-3"><i class="fas fa-database mr-2"></i>Database Management</h5>
         <button type="button" class="btn btn-outline-primary mb-3" id="btnLoadDbStats">
-            <i class="fas fa-sync-alt mr-1"></i>Muat Statistik DB
+            <i class="fas fa-sync-alt mr-1"></i>Load DB Statistics
         </button>
         <div id="dbStatsContainer">
-            <p class="text-muted">Klik "Muat Statistik DB" untuk menampilkan informasi.</p>
+            <p class="text-muted">Click "Load DB Statistics" to display information.</p>
         </div>
         <hr>
-        <h6 class="text-danger"><i class="fas fa-trash mr-1"></i>Bersihkan Data Lama</h6>
-        <p class="text-muted small">Menghapus data sensor dan log yang lebih lama dari <strong id="retentionDisplay"><?php echo $retentionDays; ?></strong> hari (sesuai pengaturan retensi).</p>
+        <h6 class="text-danger"><i class="fas fa-trash mr-1"></i>Clean Up Old Data</h6>
+        <p class="text-muted small">Deletes sensor data and logs older than <strong id="retentionDisplay"><?php echo $retentionDays; ?></strong> days (based on retention settings).</p>
         <button type="button" class="btn btn-danger" id="btnPurgeData">
-            <i class="fas fa-broom mr-1"></i>Bersihkan Data Lama
+            <i class="fas fa-broom mr-1"></i>Clean Up Old Data
         </button>
         <div id="purgeResult" class="mt-3"></div>
     </div>
@@ -443,14 +443,14 @@ $(document).ready(function () {
             data: JSON.stringify({ settings: data }),
             success: function (res) {
                 if (res && res.success) {
-                    showToast(res.message || 'Pengaturan disimpan.', 'success');
+                    showToast(res.message || 'Settings saved.', 'success');
                     if (callback) callback(res);
                 } else {
-                    showToast((res && res.message) ? res.message : 'Gagal menyimpan.', 'danger');
+                    showToast((res && res.message) ? res.message : 'Failed to save.', 'danger');
                 }
             },
             error: function () {
-                showToast('Terjadi kesalahan. Coba lagi.', 'danger');
+                showToast('An error occurred. Please try again.', 'danger');
             }
         });
     }
@@ -520,12 +520,12 @@ $(document).ready(function () {
             data: JSON.stringify(payload),
             success: function (res) {
                 if (res && res.success) {
-                    showToast('Target mesin disimpan.', 'success');
+                    showToast('Machine target saved.', 'success');
                 } else {
-                    showToast('Gagal menyimpan target mesin.', 'danger');
+                    showToast('Failed to save machine target.', 'danger');
                 }
             },
-            error: function () { showToast('Kesalahan saat menyimpan.', 'danger'); }
+            error: function () { showToast('Error while saving.', 'danger'); }
         });
     });
 
@@ -570,18 +570,18 @@ $(document).ready(function () {
                     row.find('.input-lo, .input-hi').addClass('d-none');
                     row.find('.btn-save-thresh, .btn-cancel-thresh').addClass('d-none');
                     row.find('.btn-edit-thresh').removeClass('d-none');
-                    showToast('Threshold disimpan.', 'success');
+                    showToast('Threshold saved.', 'success');
                 } else {
-                    showToast('Gagal menyimpan threshold.', 'danger');
+                    showToast('Failed to save threshold.', 'danger');
                 }
             },
-            error: function () { showToast('Kesalahan koneksi.', 'danger'); }
+            error: function () { showToast('Connection error.', 'danger'); }
         });
     });
 
     $(document).on('click', '.btn-reset-thresh', function () {
         var machineId = $(this).data('machine-id');
-        if (!confirm('Reset semua threshold untuk mesin ini ke nilai default?')) return;
+        if (!confirm('Reset all thresholds for this machine to default values?')) return;
         $.ajax({
             url: 'api/settings.php?action=reset_threshold',
             method: 'POST',
@@ -589,13 +589,13 @@ $(document).ready(function () {
             data: JSON.stringify({ machine_id: machineId }),
             success: function (res) {
                 if (res && res.success) {
-                    showToast('Threshold direset ke default.', 'info');
+                    showToast('Threshold reset to default.', 'info');
                     location.reload();
                 } else {
-                    showToast('Gagal reset threshold.', 'danger');
+                    showToast('Failed to reset threshold.', 'danger');
                 }
             },
-            error: function () { showToast('Kesalahan koneksi.', 'danger'); }
+            error: function () { showToast('Connection error.', 'danger'); }
         });
     });
 
@@ -643,16 +643,16 @@ $(document).ready(function () {
 
     $('#btnTestKoneksi').on('click', function () {
         var $result = $('#koneksiResult');
-        $result.html('<span class="badge badge-secondary">Menguji...</span>');
+        $result.html('<span class="badge badge-secondary">Testing...</span>');
         $.get('api/esp32.php?action=status', function (res) {
             if (res && res.success) {
-                $result.html('<span class="badge badge-success"><i class="fas fa-check mr-1"></i>Terhubung</span>');
+                $result.html('<span class="badge badge-success"><i class="fas fa-check mr-1"></i>Connected</span>');
             } else {
-                var msg = (res && res.message) ? res.message : 'Tidak dapat terhubung';
+                var msg = (res && res.message) ? res.message : 'Unable to connect';
                 $result.html('<span class="badge badge-danger"><i class="fas fa-times mr-1"></i>' + msg + '</span>');
             }
         }).fail(function () {
-            $result.html('<span class="badge badge-danger"><i class="fas fa-times mr-1"></i>Gagal</span>');
+            $result.html('<span class="badge badge-danger"><i class="fas fa-times mr-1"></i>Failed</span>');
         });
     });
 
@@ -660,28 +660,28 @@ $(document).ready(function () {
        TAB 6: DATABASE
     ================================================================ */
     $('#btnLoadDbStats').on('click', function () {
-        $('#dbStatsContainer').html('<p class="text-muted"><i class="fas fa-spinner fa-spin mr-1"></i>Memuat...</p>');
+        $('#dbStatsContainer').html('<p class="text-muted"><i class="fas fa-spinner fa-spin mr-1"></i>Loading...</p>');
         $.get('api/settings.php?action=db_stats', function (res) {
             if (res && res.success && res.data) {
                 var html = '<div class="table-responsive"><table class="table table-bordered table-sm" style="max-width:500px;">';
-                html += '<thead class="thead-light"><tr><th>Tabel</th><th class="text-right">Jumlah Baris</th></tr></thead><tbody>';
+                html += '<thead class="thead-light"><tr><th>Table</th><th class="text-right">Row Count</th></tr></thead><tbody>';
                 $.each(res.data, function (tbl, cnt) {
                     html += '<tr><td>' + $('<span>').text(tbl).html() + '</td><td class="text-right">' + parseInt(cnt).toLocaleString() + '</td></tr>';
                 });
                 html += '</tbody></table></div>';
                 $('#dbStatsContainer').html(html);
             } else {
-                $('#dbStatsContainer').html('<p class="text-danger">Gagal memuat statistik.</p>');
+                $('#dbStatsContainer').html('<p class="text-danger">Failed to load statistics.</p>');
             }
         }).fail(function () {
-            $('#dbStatsContainer').html('<p class="text-danger">Kesalahan koneksi.</p>');
+            $('#dbStatsContainer').html('<p class="text-danger">Connection error.</p>');
         });
     });
 
     $('#btnPurgeData').on('click', function () {
         var retDays = parseInt($('#data_retention_days').val()) || parseInt($('#retentionDisplay').text()) || 90;
-        if (!confirm('Hapus semua data yang lebih lama dari ' + retDays + ' hari? Tindakan ini tidak dapat dibatalkan.')) return;
-        $('#purgeResult').html('<span class="text-muted"><i class="fas fa-spinner fa-spin mr-1"></i>Memproses...</span>');
+        if (!confirm('Delete all data older than ' + retDays + ' days? This action cannot be undone.')) return;
+        $('#purgeResult').html('<span class="text-muted"><i class="fas fa-spinner fa-spin mr-1"></i>Processing...</span>');
         $.ajax({
             url: 'api/settings.php?action=purge_data',
             method: 'POST',
@@ -690,14 +690,14 @@ $(document).ready(function () {
             success: function (res) {
                 if (res && res.success) {
                     var deleted = (res.deleted !== undefined) ? res.deleted : '?';
-                    $('#purgeResult').html('<div class="alert alert-success"><i class="fas fa-check mr-1"></i>' + deleted + ' record berhasil dihapus.</div>');
-                    showToast(deleted + ' record dihapus.', 'success');
+                    $('#purgeResult').html('<div class="alert alert-success"><i class="fas fa-check mr-1"></i>' + deleted + ' record(s) deleted successfully.</div>');
+                    showToast(deleted + ' record(s) deleted.', 'success');
                 } else {
-                    $('#purgeResult').html('<div class="alert alert-danger">' + ((res && res.message) ? res.message : 'Gagal membersihkan data.') + '</div>');
+                    $('#purgeResult').html('<div class="alert alert-danger">' + ((res && res.message) ? res.message : 'Failed to clean up data.') + '</div>');
                 }
             },
             error: function () {
-                $('#purgeResult').html('<div class="alert alert-danger">Kesalahan koneksi.</div>');
+                $('#purgeResult').html('<div class="alert alert-danger">Connection error.</div>');
             }
         });
     });

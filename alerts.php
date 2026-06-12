@@ -63,7 +63,7 @@ require_once 'includes/header.php';
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">
-        <i class="fas fa-bell mr-2"></i>Manajemen Alert
+        <i class="fas fa-bell mr-2"></i>Alert Management
     </h1>
     <div>
         <button id="btnAckSelected" class="btn btn-warning btn-sm shadow-sm mr-2" disabled>
@@ -83,7 +83,7 @@ require_once 'includes/header.php';
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Hari Ini</div>
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Today</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $statTotal; ?></div>
                     </div>
                     <div class="col-auto"><i class="fas fa-calendar fa-2x text-gray-300"></i></div>
@@ -138,23 +138,23 @@ require_once 'includes/header.php';
 <!-- Filter Card -->
 <div class="card shadow mb-4">
     <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-filter mr-1"></i>Filter Alert</h6>
+        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-filter mr-1"></i>Filter Alerts</h6>
     </div>
     <div class="card-body">
         <form method="GET" action="alerts.php" id="filterForm">
             <div class="form-row align-items-end">
                 <div class="form-group col-md-2 mb-2">
-                    <label class="small font-weight-bold">Dari Tanggal</label>
+                    <label class="small font-weight-bold">From Date</label>
                     <input type="date" name="from" class="form-control form-control-sm" value="<?php echo htmlspecialchars($filterFrom); ?>">
                 </div>
                 <div class="form-group col-md-2 mb-2">
-                    <label class="small font-weight-bold">Sampai Tanggal</label>
+                    <label class="small font-weight-bold">To Date</label>
                     <input type="date" name="to" class="form-control form-control-sm" value="<?php echo htmlspecialchars($filterTo); ?>">
                 </div>
                 <div class="form-group col-md-3 mb-2">
-                    <label class="small font-weight-bold">Mesin</label>
+                    <label class="small font-weight-bold">Machine</label>
                     <select name="machine_id" class="form-control form-control-sm">
-                        <option value="">-- Semua Mesin --</option>
+                        <option value="">-- All Machines --</option>
                         <?php foreach ($machines as $m): ?>
                             <option value="<?php echo $m['id']; ?>" <?php echo $filterMachine == $m['id'] ? 'selected' : ''; ?>>
                                 <?php echo htmlspecialchars($m['name']); ?>
@@ -165,7 +165,7 @@ require_once 'includes/header.php';
                 <div class="form-group col-md-2 mb-2">
                     <label class="small font-weight-bold">Severity</label>
                     <select name="severity" class="form-control form-control-sm">
-                        <option value="all" <?php echo $filterSeverity === 'all' ? 'selected' : ''; ?>>Semua</option>
+                        <option value="all" <?php echo $filterSeverity === 'all' ? 'selected' : ''; ?>>All</option>
                         <option value="warning" <?php echo $filterSeverity === 'warning' ? 'selected' : ''; ?>>Warning</option>
                         <option value="critical" <?php echo $filterSeverity === 'critical' ? 'selected' : ''; ?>>Critical</option>
                     </select>
@@ -173,14 +173,14 @@ require_once 'includes/header.php';
                 <div class="form-group col-md-2 mb-2">
                     <label class="small font-weight-bold">Status</label>
                     <select name="status" class="form-control form-control-sm">
-                        <option value="all" <?php echo $filterStatus === 'all' ? 'selected' : ''; ?>>Semua</option>
+                        <option value="all" <?php echo $filterStatus === 'all' ? 'selected' : ''; ?>>All</option>
                         <option value="acknowledged" <?php echo $filterStatus === 'acknowledged' ? 'selected' : ''; ?>>Acknowledged</option>
                         <option value="unacknowledged" <?php echo $filterStatus === 'unacknowledged' ? 'selected' : ''; ?>>Unacknowledged</option>
                     </select>
                 </div>
                 <div class="form-group col-md-1 mb-2">
                     <button type="submit" class="btn btn-primary btn-sm btn-block">
-                        <i class="fas fa-search fa-sm"></i> Cari
+                        <i class="fas fa-search fa-sm"></i> Search
                     </button>
                 </div>
             </div>
@@ -191,7 +191,7 @@ require_once 'includes/header.php';
 <!-- Alerts DataTable Card -->
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-table mr-1"></i>Daftar Alert</h6>
+        <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-table mr-1"></i>Alert List</h6>
         <span class="badge badge-secondary"><?php echo count($alerts); ?> record</span>
     </div>
     <div class="card-body">
@@ -203,15 +203,15 @@ require_once 'includes/header.php';
                             <input type="checkbox" id="selectAll" title="Select All">
                         </th>
                         <th>#</th>
-                        <th>Waktu</th>
-                        <th>Mesin</th>
+                        <th>Time</th>
+                        <th>Machine</th>
                         <th>Sensor</th>
-                        <th>Nilai</th>
-                        <th>Batas Lo-Hi</th>
+                        <th>Value</th>
+                        <th>Threshold Lo-Hi</th>
                         <th>Severity</th>
                         <th>Status</th>
                         <th>Acknowledged By</th>
-                        <th>Aksi</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -286,25 +286,25 @@ require_once 'includes/header.php';
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="ackModalLabel"><i class="fas fa-check-circle mr-2"></i>Konfirmasi Acknowledge</h5>
+                <h5 class="modal-title" id="ackModalLabel"><i class="fas fa-check-circle mr-2"></i>Acknowledge Confirmation</h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <p class="mb-3">Anda akan mengakui alert berikut:</p>
+                <p class="mb-3">You are about to acknowledge the following alert:</p>
                 <table class="table table-sm table-bordered">
-                    <tr><th width="100">Mesin</th><td id="ackMachine">-</td></tr>
+                    <tr><th width="100">Machine</th><td id="ackMachine">-</td></tr>
                     <tr><th>Sensor</th><td id="ackSensor">-</td></tr>
-                    <tr><th>Nilai</th><td id="ackValue">-</td></tr>
+                    <tr><th>Value</th><td id="ackValue">-</td></tr>
                     <tr><th>Severity</th><td id="ackSeverity">-</td></tr>
                 </table>
                 <input type="hidden" id="ackAlertId" value="">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="btnConfirmAck">
-                    <i class="fas fa-check mr-1"></i>Konfirmasi
+                    <i class="fas fa-check mr-1"></i>Confirm
                 </button>
             </div>
         </div>
@@ -342,7 +342,7 @@ $(document).ready(function () {
         var id = 'toast_' + Date.now();
         var html = '<div id="' + id + '" class="toast text-white ' + bgClass + ' border-0 mb-2" role="alert" data-delay="3500">'
                  + '<div class="toast-header ' + bgClass + ' text-white">'
-                 + '<strong class="mr-auto"><i class="fas fa-bell mr-1"></i>Notifikasi</strong>'
+                 + '<strong class="mr-auto"><i class="fas fa-bell mr-1"></i>Notification</strong>'
                  + '<button type="button" class="ml-2 mb-1 close text-white" data-dismiss="toast">&times;</button>'
                  + '</div><div class="toast-body">' + message + '</div></div>';
         $('#toastContainer').append(html);
@@ -398,7 +398,7 @@ $(document).ready(function () {
         var id = $('#ackAlertId').val();
         if (!id) return;
         var $btn = $(this);
-        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Memproses...');
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Processing...');
 
         $.ajax({
             url: 'api/alerts.php?action=acknowledge',
@@ -408,15 +408,15 @@ $(document).ready(function () {
             dataType: 'json',
             success: function () {
                 $('#ackModal').modal('hide');
-                showToast('Alert berhasil di-acknowledge.', 'success');
+                showToast('Alert acknowledged successfully.', 'success');
                 setTimeout(function () { location.reload(); }, 1200);
             },
             error: function () {
                 $('#ackModal').modal('hide');
-                showToast('Gagal acknowledge alert. Silakan coba lagi.', 'danger');
+                showToast('Failed to acknowledge alert. Please try again.', 'danger');
             },
             complete: function () {
-                $btn.prop('disabled', false).html('<i class="fas fa-check mr-1"></i>Konfirmasi');
+                $btn.prop('disabled', false).html('<i class="fas fa-check mr-1"></i>Confirm');
             }
         });
     });
@@ -428,10 +428,10 @@ $(document).ready(function () {
             ids.push(parseInt($(this).val()));
         });
         if (ids.length === 0) return;
-        if (!confirm('Acknowledge ' + ids.length + ' alert yang dipilih?')) return;
+        if (!confirm('Acknowledge ' + ids.length + ' selected alert(s)?')) return;
 
         var $btn = $(this);
-        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Memproses...');
+        $btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Processing...');
 
         $.ajax({
             url: 'api/alerts.php?action=acknowledge_bulk',
@@ -440,11 +440,11 @@ $(document).ready(function () {
             data: JSON.stringify({ ids: ids }),
             dataType: 'json',
             success: function () {
-                showToast(ids.length + ' alert berhasil di-acknowledge.', 'success');
+                showToast(ids.length + ' alert(s) acknowledged successfully.', 'success');
                 setTimeout(function () { location.reload(); }, 1200);
             },
             error: function () {
-                showToast('Gagal bulk acknowledge. Silakan coba lagi.', 'danger');
+                showToast('Bulk acknowledge failed. Please try again.', 'danger');
                 $btn.prop('disabled', false).html('<i class="fas fa-check-double fa-sm mr-1"></i>Acknowledge Selected');
             }
         });

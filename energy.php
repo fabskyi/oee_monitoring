@@ -1,22 +1,22 @@
 <?php
 require_once 'includes/auth_check.php';
 $currentPage = 'energy';
-$pageTitle = 'Laporan Energi';
+$pageTitle = 'Energy Report';
 
 $db = getDB();
 
 // ── Filters ──────────────────────────────────────────────────────────────────
 $machine_id = isset($_GET['machine_id']) ? intval($_GET['machine_id']) : 0;
-$date_from  = (isset($_GET['date_from']) && $_GET['date_from'] !== '')
-              ? $_GET['date_from'] : date('Y-m-d', strtotime('-6 days'));
-$date_to    = (isset($_GET['date_to']) && $_GET['date_to'] !== '')
-              ? $_GET['date_to']   : date('Y-m-d');
-$group_by   = (isset($_GET['group_by']) && in_array($_GET['group_by'], ['hour','day']))
-              ? $_GET['group_by'] : 'day';
+$date_from = (isset($_GET['date_from']) && $_GET['date_from'] !== '')
+    ? $_GET['date_from'] : date('Y-m-d', strtotime('-6 days'));
+$date_to = (isset($_GET['date_to']) && $_GET['date_to'] !== '')
+    ? $_GET['date_to'] : date('Y-m-d');
+$group_by = (isset($_GET['group_by']) && in_array($_GET['group_by'], ['hour', 'day']))
+    ? $_GET['group_by'] : 'day';
 
 // Sanitise dates
 $date_from = date('Y-m-d', strtotime($date_from));
-$date_to   = date('Y-m-d', strtotime($date_to));
+$date_to = date('Y-m-d', strtotime($date_to));
 
 // ── Machine list ─────────────────────────────────────────────────────────────
 $stmt = $db->query("SELECT id, name FROM machines ORDER BY name");
@@ -35,7 +35,7 @@ $stmtToday = $db->prepare(
      WHERE DATE(recorded_at) = :today {$m_where}"
 );
 $stmtToday->execute([':today' => $today]);
-$kpi_today = round((float)$stmtToday->fetchColumn(), 2);
+$kpi_today = round((float) $stmtToday->fetchColumn(), 2);
 
 // ══════════════════════════════════════════════════════════════════════════════
 // KPI 2 – Peak Hour (in the selected period)
@@ -50,9 +50,9 @@ $stmtPeak = $db->prepare(
      LIMIT 1"
 );
 $stmtPeak->execute([':df' => $date_from, ':dt' => $date_to]);
-$peakRow      = $stmtPeak->fetch(PDO::FETCH_ASSOC);
-$kpi_peak_hr  = $peakRow ? (int)$peakRow['hr'] : 0;
-$kpi_peak_val = $peakRow ? round((float)$peakRow['total'], 2) : 0;
+$peakRow = $stmtPeak->fetch(PDO::FETCH_ASSOC);
+$kpi_peak_hr = $peakRow ? (int) $peakRow['hr'] : 0;
+$kpi_peak_val = $peakRow ? round((float) $peakRow['total'], 2) : 0;
 
 // ══════════════════════════════════════════════════════════════════════════════
 // KPI 3 – Most Consuming Machine
@@ -67,9 +67,9 @@ $stmtTop = $db->prepare(
      LIMIT 1"
 );
 $stmtTop->execute([':df' => $date_from, ':dt' => $date_to]);
-$topRow          = $stmtTop->fetch(PDO::FETCH_ASSOC);
+$topRow = $stmtTop->fetch(PDO::FETCH_ASSOC);
 $kpi_top_machine = $topRow ? $topRow['name'] : 'N/A';
-$kpi_top_val     = $topRow ? round((float)$topRow['total'], 2) : 0;
+$kpi_top_val = $topRow ? round((float) $topRow['total'], 2) : 0;
 
 // ══════════════════════════════════════════════════════════════════════════════
 // KPI 4 – Avg Energy per Machine (period)
@@ -84,7 +84,7 @@ $stmtAvg = $db->prepare(
      ) t"
 );
 $stmtAvg->execute([':df' => $date_from, ':dt' => $date_to]);
-$kpi_avg = round((float)$stmtAvg->fetchColumn(), 2);
+$kpi_avg = round((float) $stmtAvg->fetchColumn(), 2);
 
 // ══════════════════════════════════════════════════════════════════════════════
 // Chart 1 – Stacked bar: energy per day per machine
@@ -103,19 +103,19 @@ $stmtStack->execute([':df' => $date_from, ':dt' => $date_to]);
 $stackRows = $stmtStack->fetchAll(PDO::FETCH_ASSOC);
 
 // Build labels (dates) and datasets
-$stackDates    = [];
+$stackDates = [];
 $stackMachines = [];
 foreach ($stackRows as $r) {
     $stackDates[$r['day']] = true;
     $stackMachines[$r['machine_name']] = true;
 }
-$stackDates    = array_keys($stackDates);
+$stackDates = array_keys($stackDates);
 $stackMachines = array_keys($stackMachines);
 
 // Pivot
 $stackPivot = [];
 foreach ($stackRows as $r) {
-    $stackPivot[$r['machine_name']][$r['day']] = (float)$r['total'];
+    $stackPivot[$r['machine_name']][$r['day']] = (float) $r['total'];
 }
 
 // Hitung total per mesin → ambil top 10, sisanya jadi "Lainnya"
@@ -124,8 +124,8 @@ foreach ($stackMachines as $mName) {
     $machineTotals[$mName] = array_sum($stackPivot[$mName] ?? []);
 }
 arsort($machineTotals);
-$TOP_N       = 10;
-$top10       = array_slice(array_keys($machineTotals), 0, $TOP_N);
+$TOP_N = 10;
+$top10 = array_slice(array_keys($machineTotals), 0, $TOP_N);
 $othersNames = array_slice(array_keys($machineTotals), $TOP_N);
 
 // Pivot "Lainnya" — jumlahkan semua mesin sisanya per hari
@@ -137,8 +137,16 @@ foreach ($othersNames as $mName) {
 }
 
 $chartColors = [
-    '#4e73df','#1cc88a','#36b9cc','#f6c23e','#e74a3b',
-    '#2e59d9','#17a673','#2c9faf','#ff6b6b','#a29bfe'
+    '#4e73df',
+    '#1cc88a',
+    '#36b9cc',
+    '#f6c23e',
+    '#e74a3b',
+    '#2e59d9',
+    '#17a673',
+    '#2c9faf',
+    '#ff6b6b',
+    '#a29bfe'
 ];
 $stackDatasets = [];
 $ci = 0;
@@ -151,11 +159,11 @@ foreach ($top10 as $mName) {
     }
     $color = $chartColors[$ci % count($chartColors)];
     $stackDatasets[] = [
-        'label'           => $mName,
-        'data'            => $data,
+        'label' => $mName,
+        'data' => $data,
         'backgroundColor' => $color,
-        'borderColor'     => $color,
-        'borderWidth'     => 1,
+        'borderColor' => $color,
+        'borderWidth' => 1,
     ];
     $ci++;
 }
@@ -167,15 +175,15 @@ if (!empty($othersNames)) {
         $othersData[] = round($othersPivot[$d] ?? 0, 2);
     }
     $stackDatasets[] = [
-        'label'           => 'Lainnya (' . count($othersNames) . ' mesin)',
-        'data'            => $othersData,
+        'label' => 'Others (' . count($othersNames) . ' machines)',
+        'data' => $othersData,
         'backgroundColor' => '#b2bec3',
-        'borderColor'     => '#b2bec3',
-        'borderWidth'     => 1,
+        'borderColor' => '#b2bec3',
+        'borderWidth' => 1,
     ];
 }
 
-$chartStackLabels   = json_encode($stackDates);
+$chartStackLabels = json_encode($stackDates);
 $chartStackDatasets = json_encode($stackDatasets);
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -194,16 +202,16 @@ $hourlyRows = $stmtHourly->fetchAll(PDO::FETCH_ASSOC);
 
 $hourlyMap = [];
 foreach ($hourlyRows as $r) {
-    $hourlyMap[(int)$r['hr']] = round((float)$r['avg_total'], 3);
+    $hourlyMap[(int) $r['hr']] = round((float) $r['avg_total'], 3);
 }
 $hourlyLabels = [];
-$hourlyData   = [];
+$hourlyData = [];
 for ($h = 0; $h < 24; $h++) {
     $hourlyLabels[] = sprintf('%02d:00', $h);
-    $hourlyData[]   = isset($hourlyMap[$h]) ? $hourlyMap[$h] : 0;
+    $hourlyData[] = isset($hourlyMap[$h]) ? $hourlyMap[$h] : 0;
 }
 $chartHourlyLabels = json_encode($hourlyLabels);
-$chartHourlyData   = json_encode($hourlyData);
+$chartHourlyData = json_encode($hourlyData);
 
 // ══════════════════════════════════════════════════════════════════════════════
 // Chart 3 – Per-machine comparison (horizontal bar)
@@ -220,17 +228,17 @@ $stmtComp->execute([':df' => $date_from, ':dt' => $date_to]);
 $compRows = $stmtComp->fetchAll(PDO::FETCH_ASSOC);
 
 $compLabels = [];
-$compData   = [];
+$compData = [];
 $compColors = [];
 $ci2 = 0;
 foreach ($compRows as $r) {
     $compLabels[] = $r['name'];
-    $compData[]   = round((float)$r['total'], 2);
+    $compData[] = round((float) $r['total'], 2);
     $compColors[] = $chartColors[$ci2 % count($chartColors)];
     $ci2++;
 }
 $chartCompLabels = json_encode($compLabels);
-$chartCompData   = json_encode($compData);
+$chartCompData = json_encode($compData);
 $chartCompColors = json_encode($compColors);
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -244,20 +252,26 @@ $stmtPhase = $db->prepare(
 $stmtPhase->execute([':df' => $date_from, ':dt' => $date_to]);
 $phaseRow = $stmtPhase->fetch(PDO::FETCH_ASSOC);
 
-$avg_vr = $phaseRow ? round((float)$phaseRow['avg_vr'], 1) : 0;
-$avg_vs = $phaseRow ? round((float)$phaseRow['avg_vs'], 1) : 0;
-$avg_vt = $phaseRow ? round((float)$phaseRow['avg_vt'], 1) : 0;
+$avg_vr = $phaseRow ? round((float) $phaseRow['avg_vr'], 1) : 0;
+$avg_vs = $phaseRow ? round((float) $phaseRow['avg_vs'], 1) : 0;
+$avg_vt = $phaseRow ? round((float) $phaseRow['avg_vt'], 1) : 0;
 
-function phaseImbalance($vr, $vs, $vt) {
-    if ($vr == 0 && $vs == 0 && $vt == 0) return ['pct' => 0, 'badge' => 'secondary', 'label' => 'No Data'];
+function phaseImbalance($vr, $vs, $vt)
+{
+    if ($vr == 0 && $vs == 0 && $vt == 0)
+        return ['pct' => 0, 'badge' => 'secondary', 'label' => 'No Data'];
     $avg = ($vr + $vs + $vt) / 3;
-    if ($avg == 0) return ['pct' => 0, 'badge' => 'secondary', 'label' => 'No Data'];
+    if ($avg == 0)
+        return ['pct' => 0, 'badge' => 'secondary', 'label' => 'No Data'];
     $max = max($vr, $vs, $vt);
     $min = min($vr, $vs, $vt);
     $pct = round(($max - $min) / $avg * 100, 2);
-    if ($pct < 2)      return ['pct' => $pct, 'badge' => 'success', 'label' => 'Balanced'];
-    elseif ($pct <= 5) return ['pct' => $pct, 'badge' => 'warning', 'label' => 'Slight Imbalance'];
-    else               return ['pct' => $pct, 'badge' => 'danger',  'label' => 'Unbalanced'];
+    if ($pct < 2)
+        return ['pct' => $pct, 'badge' => 'success', 'label' => 'Balanced'];
+    elseif ($pct <= 5)
+        return ['pct' => $pct, 'badge' => 'warning', 'label' => 'Slight Imbalance'];
+    else
+        return ['pct' => $pct, 'badge' => 'danger', 'label' => 'Unbalanced'];
 }
 
 $phaseStatus = phaseImbalance($avg_vr, $avg_vs, $avg_vt);
@@ -287,10 +301,10 @@ $detailRows = $stmtDetail->fetchAll(PDO::FETCH_ASSOC);
 // Build Export CSV URL params
 // ══════════════════════════════════════════════════════════════════════════════
 $exportParams = http_build_query([
-    'action'     => 'e_report',
-    'export'     => 'csv',
-    'from'       => $date_from,
-    'to'         => $date_to,
+    'action' => 'e_report',
+    'export' => 'csv',
+    'from' => $date_from,
+    'to' => $date_to,
     'machine_id' => $machine_id,
 ]);
 
@@ -301,7 +315,7 @@ require_once 'includes/header.php';
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">
-        <i class="fas fa-bolt text-warning mr-2"></i>Laporan Energi
+        <i class="fas fa-bolt text-warning mr-2"></i>Energy Report
     </h1>
     <button class="btn btn-sm btn-success shadow-sm" id="btnExportCsv">
         <i class="fas fa-file-csv fa-sm text-white-50 mr-1"></i> Export CSV
@@ -316,9 +330,9 @@ require_once 'includes/header.php';
     <div class="card-body">
         <form method="GET" action="energy.php" class="form-inline flex-wrap" id="filterForm">
             <div class="form-group mr-3 mb-2">
-                <label class="mr-2 font-weight-bold">Mesin:</label>
+                <label class="mr-2 font-weight-bold">Machine:</label>
                 <select name="machine_id" class="form-control form-control-sm">
-                    <option value="0" <?php echo $machine_id == 0 ? 'selected' : ''; ?>>-- Semua Mesin --</option>
+                    <option value="0" <?php echo $machine_id == 0 ? 'selected' : ''; ?>>-- All Machines --</option>
                     <?php foreach ($machine_list as $m): ?>
                         <option value="<?php echo $m['id']; ?>" <?php echo $machine_id == $m['id'] ? 'selected' : ''; ?>>
                             <?php echo htmlspecialchars($m['name']); ?>
@@ -327,25 +341,25 @@ require_once 'includes/header.php';
                 </select>
             </div>
             <div class="form-group mr-3 mb-2">
-                <label class="mr-2 font-weight-bold">Dari:</label>
+                <label class="mr-2 font-weight-bold">From:</label>
                 <input type="date" name="date_from" class="form-control form-control-sm"
-                       value="<?php echo htmlspecialchars($date_from); ?>">
+                    value="<?php echo htmlspecialchars($date_from); ?>">
             </div>
             <div class="form-group mr-3 mb-2">
-                <label class="mr-2 font-weight-bold">Sampai:</label>
+                <label class="mr-2 font-weight-bold">To:</label>
                 <input type="date" name="date_to" class="form-control form-control-sm"
-                       value="<?php echo htmlspecialchars($date_to); ?>">
+                    value="<?php echo htmlspecialchars($date_to); ?>">
             </div>
             <div class="form-group mr-3 mb-2">
                 <label class="mr-2 font-weight-bold">Group By:</label>
                 <select name="group_by" class="form-control form-control-sm">
-                    <option value="day"  <?php echo $group_by === 'day'  ? 'selected' : ''; ?>>Hari</option>
-                    <option value="hour" <?php echo $group_by === 'hour' ? 'selected' : ''; ?>>Jam</option>
+                    <option value="day" <?php echo $group_by === 'day' ? 'selected' : ''; ?>>Day</option>
+                    <option value="hour" <?php echo $group_by === 'hour' ? 'selected' : ''; ?>>Hour</option>
                 </select>
             </div>
             <div class="form-group mb-2">
                 <button type="submit" class="btn btn-primary btn-sm">
-                    <i class="fas fa-search mr-1"></i>Terapkan
+                    <i class="fas fa-search mr-1"></i>Apply
                 </button>
                 <a href="energy.php" class="btn btn-secondary btn-sm ml-2">
                     <i class="fas fa-redo mr-1"></i>Reset
@@ -353,8 +367,8 @@ require_once 'includes/header.php';
             </div>
         </form>
         <small class="text-muted">
-            Periode: <strong><?php echo date('d M Y', strtotime($date_from)); ?></strong>
-            s/d <strong><?php echo date('d M Y', strtotime($date_to)); ?></strong>
+            Period: <strong><?php echo date('d M Y', strtotime($date_from)); ?></strong>
+            to <strong><?php echo date('d M Y', strtotime($date_to)); ?></strong>
         </small>
     </div>
 </div>
@@ -368,7 +382,7 @@ require_once 'includes/header.php';
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                            Total Energi Hari Ini
+                            Total Energy Today
                         </div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
                             <?php echo number_format($kpi_today, 2); ?> kWh
@@ -390,7 +404,7 @@ require_once 'includes/header.php';
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                            Jam Puncak (Periode)
+                            Peak Hour (Period)
                         </div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
                             <?php echo sprintf('%02d:00', $kpi_peak_hr); ?>
@@ -414,7 +428,7 @@ require_once 'includes/header.php';
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                            Mesin Paling Boros
+                            Highest Consuming Machine
                         </div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
                             <?php echo htmlspecialchars($kpi_top_machine); ?>
@@ -438,12 +452,12 @@ require_once 'includes/header.php';
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                         <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                            Rata-rata per Mesin
+                            Average per Machine
                         </div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">
                             <?php echo number_format($kpi_avg, 2); ?> kWh
                         </div>
-                        <div class="text-xs text-muted mt-1">Dalam periode yang dipilih</div>
+                        <div class="text-xs text-muted mt-1">In the selected period</div>
                     </div>
                     <div class="col-auto">
                         <i class="fas fa-chart-bar fa-2x text-gray-300"></i>
@@ -461,22 +475,23 @@ require_once 'includes/header.php';
         <div class="card shadow">
             <div class="card-header py-3 d-flex align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">
-                    <i class="fas fa-chart-bar mr-1"></i>Energi per Hari per Mesin (kWh)
+                    <i class="fas fa-chart-bar mr-1"></i>Energy per Day per Machine (kWh)
                 </h6>
                 <div class="d-flex align-items-center gap-2" style="gap:8px;">
-                  <select id="stackMachineSelect" class="form-control form-control-sm" style="min-width:200px;max-width:300px;">
-                    <option value="__top10__">— Top 10 Tertinggi —</option>
-                    <?php foreach (array_keys($machineTotals) as $mName): ?>
-                    <option value="<?= htmlspecialchars($mName) ?>"><?= htmlspecialchars($mName) ?></option>
-                    <?php endforeach; ?>
-                  </select>
+                    <select id="stackMachineSelect" class="form-control form-control-sm"
+                        style="min-width:200px;max-width:300px;">
+                        <option value="__top10__">— Top 10 Highest —</option>
+                        <?php foreach (array_keys($machineTotals) as $mName): ?>
+                            <option value="<?= htmlspecialchars($mName) ?>"><?= htmlspecialchars($mName) ?></option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
             </div>
             <div class="card-body">
                 <?php if (empty($stackDates)): ?>
                     <div class="text-center text-muted py-5">
                         <i class="fas fa-chart-bar fa-3x mb-3 d-block"></i>
-                        Tidak ada data untuk periode ini.
+                        No data for this period.
                     </div>
                 <?php else: ?>
                     <div class="chart-bar" style="position:relative; height:320px;">
@@ -492,7 +507,7 @@ require_once 'includes/header.php';
         <div class="card shadow">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">
-                    <i class="fas fa-clock mr-1"></i>Distribusi Jam (Avg kWh)
+                    <i class="fas fa-clock mr-1"></i>Hourly Distribution (Avg kWh)
                 </h6>
             </div>
             <div class="card-body">
@@ -511,17 +526,18 @@ require_once 'includes/header.php';
         <div class="card shadow">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">
-                    <i class="fas fa-exchange-alt mr-1"></i>Perbandingan Konsumsi per Mesin
+                    <i class="fas fa-exchange-alt mr-1"></i>Consumption Comparison per Machine
                 </h6>
             </div>
             <div class="card-body">
                 <?php if (empty($compLabels)): ?>
                     <div class="text-center text-muted py-5">
                         <i class="fas fa-chart-bar fa-3x mb-3 d-block"></i>
-                        Tidak ada data untuk periode ini.
+                        No data for this period.
                     </div>
                 <?php else: ?>
-                    <div style="position:relative; min-height:200px; height:<?php echo max(200, count($compLabels) * 40); ?>px;">
+                    <div
+                        style="position:relative; min-height:200px; height:<?php echo max(200, count($compLabels) * 40); ?>px;">
                         <canvas id="chartComp"></canvas>
                     </div>
                 <?php endif; ?>
@@ -534,13 +550,14 @@ require_once 'includes/header.php';
         <div class="card shadow">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">
-                    <i class="fas fa-project-diagram mr-1"></i>Keseimbangan Tegangan Fasa
+                    <i class="fas fa-project-diagram mr-1"></i>Phase Voltage Balance
                 </h6>
             </div>
             <div class="card-body">
                 <!-- Overall imbalance badge -->
                 <div class="text-center mb-3">
-                    <span class="badge badge-<?php echo $phaseStatus['badge']; ?> badge-pill px-3 py-2" style="font-size:0.9rem;">
+                    <span class="badge badge-<?php echo $phaseStatus['badge']; ?> badge-pill px-3 py-2"
+                        style="font-size:0.9rem;">
                         <?php echo $phaseStatus['label']; ?>
                         &mdash; Imbalance: <?php echo $phaseStatus['pct']; ?>%
                     </span>
@@ -550,9 +567,11 @@ require_once 'includes/header.php';
                     <div class="col-md-4 mb-3">
                         <div class="card border-left-danger h-100 py-2 shadow-sm">
                             <div class="card-body text-center p-2">
-                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Fasa R (V_R)</div>
-                                <div class="h4 font-weight-bold text-gray-800"><?php echo number_format($avg_vr, 1); ?> V</div>
-                                <div class="text-xs text-muted">Rata-rata</div>
+                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Phase R (V_R)
+                                </div>
+                                <div class="h4 font-weight-bold text-gray-800"><?php echo number_format($avg_vr, 1); ?>
+                                    V</div>
+                                <div class="text-xs text-muted">Average</div>
                                 <?php
                                 $vr_dev = ($avg_vr + $avg_vs + $avg_vt) > 0
                                     ? round(abs($avg_vr - ($avg_vr + $avg_vs + $avg_vt) / 3), 2) : 0;
@@ -569,9 +588,11 @@ require_once 'includes/header.php';
                     <div class="col-md-4 mb-3">
                         <div class="card border-left-warning h-100 py-2 shadow-sm">
                             <div class="card-body text-center p-2">
-                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Fasa S (V_S)</div>
-                                <div class="h4 font-weight-bold text-gray-800"><?php echo number_format($avg_vs, 1); ?> V</div>
-                                <div class="text-xs text-muted">Rata-rata</div>
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Phase S (V_S)
+                                </div>
+                                <div class="h4 font-weight-bold text-gray-800"><?php echo number_format($avg_vs, 1); ?>
+                                    V</div>
+                                <div class="text-xs text-muted">Average</div>
                                 <?php
                                 $vs_dev = ($avg_vr + $avg_vs + $avg_vt) > 0
                                     ? round(abs($avg_vs - ($avg_vr + $avg_vs + $avg_vt) / 3), 2) : 0;
@@ -588,9 +609,11 @@ require_once 'includes/header.php';
                     <div class="col-md-4 mb-3">
                         <div class="card border-left-primary h-100 py-2 shadow-sm">
                             <div class="card-body text-center p-2">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Fasa T (V_T)</div>
-                                <div class="h4 font-weight-bold text-gray-800"><?php echo number_format($avg_vt, 1); ?> V</div>
-                                <div class="text-xs text-muted">Rata-rata</div>
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Phase T (V_T)
+                                </div>
+                                <div class="h4 font-weight-bold text-gray-800"><?php echo number_format($avg_vt, 1); ?>
+                                    V</div>
+                                <div class="text-xs text-muted">Average</div>
                                 <?php
                                 $vt_dev = ($avg_vr + $avg_vs + $avg_vt) > 0
                                     ? round(abs($avg_vt - ($avg_vr + $avg_vs + $avg_vt) / 3), 2) : 0;
@@ -620,7 +643,7 @@ require_once 'includes/header.php';
 <div class="card shadow mb-4">
     <div class="card-header py-3 d-flex align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">
-            <i class="fas fa-table mr-1"></i>Detail Energi
+            <i class="fas fa-table mr-1"></i>Energy Details
         </h6>
         <button class="btn btn-sm btn-success" id="btnExportCsv2">
             <i class="fas fa-file-csv mr-1"></i>Export CSV
@@ -628,23 +651,24 @@ require_once 'includes/header.php';
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered table-hover table-sm dataTable no-auto-init" id="energyDetailTable" width="100%">
+            <table class="table table-bordered table-hover table-sm dataTable no-auto-init" id="energyDetailTable"
+                width="100%">
                 <thead class="thead-dark">
                     <tr>
-                        <th>Tanggal</th>
-                        <th>Mesin</th>
+                        <th>Date</th>
+                        <th>Machine</th>
                         <th>E_R (kWh)</th>
                         <th>E_S (kWh)</th>
                         <th>E_T (kWh)</th>
                         <th>Total (kWh)</th>
-                        <th>Avg Tegangan (V)</th>
-                        <th>Peak Arus (A)</th>
+                        <th>Avg Voltage (V)</th>
+                        <th>Peak Current (A)</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($detailRows)): ?>
                         <tr>
-                            <td colspan="8" class="text-center text-muted">Tidak ada data untuk periode ini.</td>
+                            <td colspan="8" class="text-center text-muted">No data for this period.</td>
                         </tr>
                     <?php else: ?>
                         <?php foreach ($detailRows as $row): ?>
@@ -662,18 +686,22 @@ require_once 'includes/header.php';
                     <?php endif; ?>
                 </tbody>
                 <?php if (!empty($detailRows)): ?>
-                <tfoot>
-                    <tr class="table-dark font-weight-bold">
-                        <td class="font-weight-bold">TOTAL</td>
-                        <td></td>
-                        <td class="text-right"><?php echo number_format(array_sum(array_column($detailRows, 'sum_er')), 3); ?></td>
-                        <td class="text-right"><?php echo number_format(array_sum(array_column($detailRows, 'sum_es')), 3); ?></td>
-                        <td class="text-right"><?php echo number_format(array_sum(array_column($detailRows, 'sum_et')), 3); ?></td>
-                        <td class="text-right"><?php echo number_format(array_sum(array_column($detailRows, 'total')), 3); ?></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </tfoot>
+                    <tfoot>
+                        <tr class="table-dark font-weight-bold">
+                            <td class="font-weight-bold">TOTAL</td>
+                            <td></td>
+                            <td class="text-right">
+                                <?php echo number_format(array_sum(array_column($detailRows, 'sum_er')), 3); ?></td>
+                            <td class="text-right">
+                                <?php echo number_format(array_sum(array_column($detailRows, 'sum_es')), 3); ?></td>
+                            <td class="text-right">
+                                <?php echo number_format(array_sum(array_column($detailRows, 'sum_et')), 3); ?></td>
+                            <td class="text-right">
+                                <?php echo number_format(array_sum(array_column($detailRows, 'total')), 3); ?></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
                 <?php endif; ?>
             </table>
         </div>
@@ -684,187 +712,190 @@ require_once 'includes/header.php';
 
 <!-- ── ALL SCRIPTS AT BOTTOM ─────────────────────────────────────────────── -->
 <script>
-(function () {
-    // ── Export CSV ────────────────────────────────────────────────────────────
-    var exportUrl = 'api/reports.php?<?php echo $exportParams; ?>';
-    document.getElementById('btnExportCsv').addEventListener('click', function () {
-        window.location = exportUrl;
-    });
-    document.getElementById('btnExportCsv2').addEventListener('click', function () {
-        window.location = exportUrl;
-    });
-
-    // ── Chart 1 – Stacked Bar ─────────────────────────────────────────────────
-    var stackLabels    = <?php echo $chartStackLabels; ?>;
-    var stackDatasets  = <?php echo $chartStackDatasets; ?>;  // top10 + lainnya (default)
-    var allStackPivot  = <?php echo json_encode($stackPivot); ?>;
-    var allStackDates  = <?php echo json_encode($stackDates); ?>;
-    var chartColors    = ['#4e73df','#1cc88a','#36b9cc','#f6c23e','#e74a3b','#2e59d9','#17a673','#2c9faf','#ff6b6b','#a29bfe','#fd79a8','#00cec9'];
-
-    if (document.getElementById('chartStacked') && stackLabels.length > 0) {
-        var ctxStack = document.getElementById('chartStacked').getContext('2d');
-
-        var stackChartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                xAxes: [{ stacked: true, gridLines: { display: false }, ticks: { maxTicksLimit: 14, fontSize: 11 } }],
-                yAxes: [{ stacked: true, ticks: { beginAtZero: true, fontSize: 11,
-                    callback: function (v) { return v.toLocaleString() + ' kWh'; }
-                }, gridLines: { color: 'rgba(0,0,0,.05)' } }]
-            },
-            tooltips: {
-                mode: 'index', intersect: false,
-                backgroundColor: 'rgba(17,24,39,.9)', titleFontSize: 12, bodyFontSize: 11,
-                callbacks: {
-                    title: function(items){ return 'Tanggal: ' + items[0].label; },
-                    label: function(item, data){
-                        if (item.yLabel === 0) return null;
-                        return '  ' + data.datasets[item.datasetIndex].label + ': ' + item.yLabel.toFixed(1) + ' kWh';
-                    },
-                    footer: function(items){
-                        var total = items.reduce(function(s,i){ return s + i.yLabel; }, 0);
-                        return 'Total: ' + total.toFixed(1) + ' kWh';
-                    }
-                }
-            },
-            legend: { position: 'bottom', labels: { fontSize: 11, padding: 12, usePointStyle: true, pointStyle: 'rect' } },
-            layout: { padding: { top: 8 } }
-        };
-
-        var stackChart = new Chart(ctxStack, {
-            type: 'bar',
-            data: { labels: stackLabels, datasets: stackDatasets },
-            options: stackChartOptions
+    (function () {
+        // ── Export CSV ────────────────────────────────────────────────────────────
+        var exportUrl = 'api/reports.php?<?php echo $exportParams; ?>';
+        document.getElementById('btnExportCsv').addEventListener('click', function () {
+            window.location = exportUrl;
+        });
+        document.getElementById('btnExportCsv2').addEventListener('click', function () {
+            window.location = exportUrl;
         });
 
-        /* ── Dropdown handler ── */
-        var sel = document.getElementById('stackMachineSelect');
-        if (sel) {
-            sel.addEventListener('change', function(){
-                var val = this.value;
-                var newDatasets;
+        // ── Chart 1 – Stacked Bar ─────────────────────────────────────────────────
+        var stackLabels = <?php echo $chartStackLabels; ?>;
+        var stackDatasets = <?php echo $chartStackDatasets; ?>;  // top10 + lainnya (default)
+        var allStackPivot = <?php echo json_encode($stackPivot); ?>;
+        var allStackDates = <?php echo json_encode($stackDates); ?>;
+        var chartColors = ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#2e59d9', '#17a673', '#2c9faf', '#ff6b6b', '#a29bfe', '#fd79a8', '#00cec9'];
 
-                if (val === '__top10__') {
-                    // Kembalikan ke top10 + lainnya
-                    newDatasets = stackDatasets;
-                } else {
-                    // Tampilkan hanya mesin yang dipilih
-                    var data = allStackDates.map(function(d){
-                        return allStackPivot[val] && allStackPivot[val][d] ? +parseFloat(allStackPivot[val][d]).toFixed(2) : 0;
-                    });
-                    newDatasets = [{
-                        label: val,
-                        data: data,
-                        backgroundColor: '#4e73df',
-                        borderColor: '#4e73df',
+        if (document.getElementById('chartStacked') && stackLabels.length > 0) {
+            var ctxStack = document.getElementById('chartStacked').getContext('2d');
+
+            var stackChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    xAxes: [{ stacked: true, gridLines: { display: false }, ticks: { maxTicksLimit: 14, fontSize: 11 } }],
+                    yAxes: [{
+                        stacked: true, ticks: {
+                            beginAtZero: true, fontSize: 11,
+                            callback: function (v) { return v.toLocaleString() + ' kWh'; }
+                        }, gridLines: { color: 'rgba(0,0,0,.05)' }
+                    }]
+                },
+                tooltips: {
+                    mode: 'index', intersect: false,
+                    backgroundColor: 'rgba(17,24,39,.9)', titleFontSize: 12, bodyFontSize: 11,
+                    callbacks: {
+                        title: function (items) { return 'Date: ' + items[0].label; },
+                        label: function (item, data) {
+                            if (item.yLabel === 0) return null;
+                            return '  ' + data.datasets[item.datasetIndex].label + ': ' + item.yLabel.toFixed(1) + ' kWh';
+                        },
+                        footer: function (items) {
+                            var total = items.reduce(function (s, i) { return s + i.yLabel; }, 0);
+                            return 'Total: ' + total.toFixed(1) + ' kWh';
+                        }
+                    }
+                },
+                legend: { position: 'bottom', labels: { fontSize: 11, padding: 12, usePointStyle: true, pointStyle: 'rect' } },
+                layout: { padding: { top: 8 } }
+            };
+
+            var stackChart = new Chart(ctxStack, {
+                type: 'bar',
+                data: { labels: stackLabels, datasets: stackDatasets },
+                options: stackChartOptions
+            });
+
+            /* ── Dropdown handler ── */
+            var sel = document.getElementById('stackMachineSelect');
+            if (sel) {
+                sel.addEventListener('change', function () {
+                    var val = this.value;
+                    var newDatasets;
+
+                    if (val === '__top10__') {
+                        // Kembalikan ke top10 + lainnya
+                        newDatasets = stackDatasets;
+                    } else {
+                        // Tampilkan hanya mesin yang dipilih
+                        var data = allStackDates.map(function (d) {
+                            return allStackPivot[val] && allStackPivot[val][d] ? +parseFloat(allStackPivot[val][d]).toFixed(2) : 0;
+                        });
+                        newDatasets = [{
+                            label: val,
+                            data: data,
+                            backgroundColor: '#4e73df',
+                            borderColor: '#4e73df',
+                            borderWidth: 1
+                        }];
+                    }
+
+                    stackChart.data.datasets = newDatasets;
+                    stackChart.update();
+                });
+            }
+        }
+
+        // ── Chart 2 – Hourly Distribution ────────────────────────────────────────
+        var hourlyLabels = <?php echo $chartHourlyLabels; ?>;
+        var hourlyData = <?php echo $chartHourlyData; ?>;
+
+        if (document.getElementById('chartHourly')) {
+            var ctxHourly = document.getElementById('chartHourly').getContext('2d');
+            new Chart(ctxHourly, {
+                type: 'bar',
+                data: {
+                    labels: hourlyLabels,
+                    datasets: [{
+                        label: 'Avg kWh',
+                        data: hourlyData,
+                        backgroundColor: 'rgba(78, 115, 223, 0.7)',
+                        borderColor: 'rgba(78, 115, 223, 1)',
                         borderWidth: 1
-                    }];
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        xAxes: [{
+                            gridLines: { display: false },
+                            ticks: { maxRotation: 45, minRotation: 45 }
+                        }],
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                callback: function (v) { return v + ' kWh'; }
+                            }
+                        }]
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function (item) {
+                                return 'Avg: ' + parseFloat(item.yLabel).toFixed(3) + ' kWh';
+                            }
+                        }
+                    },
+                    legend: { display: false }
                 }
-
-                stackChart.data.datasets = newDatasets;
-                stackChart.update();
             });
         }
-    }
 
-    // ── Chart 2 – Hourly Distribution ────────────────────────────────────────
-    var hourlyLabels = <?php echo $chartHourlyLabels; ?>;
-    var hourlyData   = <?php echo $chartHourlyData; ?>;
+        // ── Chart 3 – Per-Machine Horizontal Bar ──────────────────────────────────
+        var compLabels = <?php echo $chartCompLabels; ?>;
+        var compData = <?php echo $chartCompData; ?>;
+        var compColors = <?php echo $chartCompColors; ?>;
 
-    if (document.getElementById('chartHourly')) {
-        var ctxHourly = document.getElementById('chartHourly').getContext('2d');
-        new Chart(ctxHourly, {
-            type: 'bar',
-            data: {
-                labels: hourlyLabels,
-                datasets: [{
-                    label: 'Avg kWh',
-                    data: hourlyData,
-                    backgroundColor: 'rgba(78, 115, 223, 0.7)',
-                    borderColor: 'rgba(78, 115, 223, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    xAxes: [{
-                        gridLines: { display: false },
-                        ticks: { maxRotation: 45, minRotation: 45 }
-                    }],
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true,
-                            callback: function (v) { return v + ' kWh'; }
-                        }
+        if (document.getElementById('chartComp') && compLabels.length > 0) {
+            var ctxComp = document.getElementById('chartComp').getContext('2d');
+            new Chart(ctxComp, {
+                type: 'horizontalBar',
+                data: {
+                    labels: compLabels,
+                    datasets: [{
+                        label: 'Total kWh',
+                        data: compData,
+                        backgroundColor: compColors,
+                        borderColor: compColors,
+                        borderWidth: 1
                     }]
                 },
-                tooltips: {
-                    callbacks: {
-                        label: function (item) {
-                            return 'Avg: ' + parseFloat(item.yLabel).toFixed(3) + ' kWh';
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        xAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                callback: function (v) { return v + ' kWh'; }
+                            }
+                        }],
+                        yAxes: [{
+                            gridLines: { display: false }
+                        }]
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function (item) {
+                                return parseFloat(item.xLabel).toFixed(2) + ' kWh';
+                            }
                         }
-                    }
-                },
-                legend: { display: false }
-            }
-        });
-    }
+                    },
+                    legend: { display: false }
+                }
+            });
+        }
 
-    // ── Chart 3 – Per-Machine Horizontal Bar ──────────────────────────────────
-    var compLabels = <?php echo $chartCompLabels; ?>;
-    var compData   = <?php echo $chartCompData; ?>;
-    var compColors = <?php echo $chartCompColors; ?>;
-
-    if (document.getElementById('chartComp') && compLabels.length > 0) {
-        var ctxComp = document.getElementById('chartComp').getContext('2d');
-        new Chart(ctxComp, {
-            type: 'horizontalBar',
-            data: {
-                labels: compLabels,
-                datasets: [{
-                    label: 'Total kWh',
-                    data: compData,
-                    backgroundColor: compColors,
-                    borderColor: compColors,
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    xAxes: [{
-                        ticks: {
-                            beginAtZero: true,
-                            callback: function (v) { return v + ' kWh'; }
-                        }
-                    }],
-                    yAxes: [{
-                        gridLines: { display: false }
-                    }]
-                },
-                tooltips: {
-                    callbacks: {
-                        label: function (item) {
-                            return parseFloat(item.xLabel).toFixed(2) + ' kWh';
-                        }
-                    }
-                },
-                legend: { display: false }
-            }
+        // ── DataTable ─────────────────────────────────────────────────────────────
+        $(document).ready(function () {
+            safeDataTable('#energyDetailTable', {
+                order: [[0, 'desc']],
+                pageLength: 25,
+                columnDefs: [{ targets: [2, 3, 4, 5, 6, 7], className: 'text-right' }]
+            });
         });
-    }
-
-    // ── DataTable ─────────────────────────────────────────────────────────────
-    $(document).ready(function () {
-        safeDataTable('#energyDetailTable', {
-            order: [[0, 'desc']],
-            pageLength: 25,
-            columnDefs: [{ targets: [2, 3, 4, 5, 6, 7], className: 'text-right' }]
-        });
-    });
-})();
+    })();
 </script>

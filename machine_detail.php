@@ -228,7 +228,7 @@ include 'includes/header.php';
             <small class="text-muted">
                 Model: <strong><?= htmlspecialchars($machine['model'] ?: '-') ?></strong>
                 &nbsp;|&nbsp;
-                Lini: <strong><?= htmlspecialchars($machine['line_name'] ?: '-') ?></strong>
+                Line: <strong><?= htmlspecialchars($machine['line_name'] ?: '-') ?></strong>
             </small>
             &nbsp;
             <span class="badge badge-<?= strtolower($machine['status']) === 'run' ? 'success' : 'danger' ?> ml-1"
@@ -251,7 +251,7 @@ include 'includes/header.php';
     </div>
     <div class="mt-2 mt-sm-0">
         <a href="machines.php" class="btn btn-secondary btn-sm mr-2">
-            <i class="fas fa-arrow-left fa-sm mr-1"></i>Kembali
+            <i class="fas fa-arrow-left fa-sm mr-1"></i>Back
         </a>
         <button class="btn btn-success btn-sm"
             onclick="window.location='api/reports.php?action=oee_summary&machine_id=<?= $machineId ?>&export=csv'">
@@ -399,7 +399,7 @@ foreach ($sensorDefs as $sd):
 <div class="card shadow mb-4">
     <div class="card-header py-2">
         <h6 class="m-0 font-weight-bold text-primary">
-            <i class="fas fa-chart-bar mr-2"></i>Riwayat OEE 30 Hari
+            <i class="fas fa-chart-bar mr-2"></i>OEE History – Last 30 Days
         </h6>
     </div>
     <div class="card-body">
@@ -413,7 +413,7 @@ foreach ($sensorDefs as $sd):
 <div class="card shadow mb-4">
     <div class="card-header py-2">
         <h6 class="m-0 font-weight-bold text-primary">
-            <i class="fas fa-table mr-2"></i>Riwayat Sensor (50 Terakhir)
+            <i class="fas fa-table mr-2"></i>Sensor History (Last 50)
         </h6>
     </div>
     <div class="card-body">
@@ -421,7 +421,7 @@ foreach ($sensorDefs as $sd):
             <table class="table table-bordered table-sm" id="sensorHistoryTable" width="100%">
                 <thead class="thead-light">
                     <tr>
-                        <th>Waktu</th>
+                        <th>Time</th>
                         <th>V_R (V)</th><th>V_S (V)</th><th>V_T (V)</th>
                         <th>A_R (A)</th><th>A_S (A)</th><th>A_T (A)</th>
                         <th>Temp (°C)</th><th>Hum (%)</th>
@@ -453,7 +453,7 @@ foreach ($sensorDefs as $sd):
 <div class="card shadow mb-4">
     <div class="card-header py-2">
         <h6 class="m-0 font-weight-bold text-danger">
-            <i class="fas fa-bell mr-2"></i>Alert Terbaru
+            <i class="fas fa-bell mr-2"></i>Recent Alerts
         </h6>
     </div>
     <div class="card-body">
@@ -461,16 +461,16 @@ foreach ($sensorDefs as $sd):
             <table class="table table-bordered table-sm" id="alertsTable" width="100%">
                 <thead class="thead-light">
                     <tr>
-                        <th>Waktu</th>
+                        <th>Time</th>
                         <th>Sensor</th>
-                        <th>Nilai</th>
+                        <th>Value</th>
                         <th>Severity</th>
                         <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
                 <?php if (empty($recentAlerts)): ?>
-                    <tr><td colspan="5" class="text-center text-muted">Tidak ada alert</td></tr>
+                    <tr><td colspan="5" class="text-center text-muted">No alerts</td></tr>
                 <?php else: ?>
                 <?php foreach ($recentAlerts as $al):
                     $sevBadge = 'secondary';
@@ -764,7 +764,7 @@ $(document).ready(function () {
                         var sev = (al.severity||'').toLowerCase();
                         var type = sev==='critical'?'danger': sev==='warning'?'warning':'info';
                         showToast('⚠ Alert: <strong>'+al.sensor_key+'</strong> = '+al.sensor_value
-                            +' pada mesin ini', type);
+                            +' on this machine', type);
                     });
                 }
 

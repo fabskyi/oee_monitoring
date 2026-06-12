@@ -37,9 +37,9 @@ require_once __DIR__ . '/includes/header.php';
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">
-        <i class="fas fa-file-export mr-2"></i>Laporan &amp; Export
+        <i class="fas fa-file-export mr-2"></i>Reports &amp; Export
     </h1>
-    <small class="text-muted">Pilih jenis laporan, konfigurasi parameter, lalu generate</small>
+    <small class="text-muted">Select a report type, configure parameters, then generate</small>
 </div>
 
 <!-- Stats Row -->
@@ -83,7 +83,7 @@ require_once __DIR__ . '/includes/header.php';
         <div class="card shadow">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">
-                    <i class="fas fa-list mr-1"></i> Jenis Laporan
+                    <i class="fas fa-list mr-1"></i> Report Types
                 </h6>
             </div>
             <div class="card-body p-0">
@@ -94,7 +94,7 @@ require_once __DIR__ . '/includes/header.php';
                             <i class="fas fa-chart-bar fa-lg mr-3 mt-1 text-primary"></i>
                             <div>
                                 <div class="font-weight-bold">OEE Summary</div>
-                                <small class="text-muted">Ringkasan nilai OEE harian per mesin</small>
+                                <small class="text-muted">Daily OEE value summary per machine</small>
                             </div>
                         </div>
                     </a>
@@ -104,7 +104,7 @@ require_once __DIR__ . '/includes/header.php';
                             <i class="fas fa-bell fa-lg mr-3 mt-1 text-danger"></i>
                             <div>
                                 <div class="font-weight-bold">Alert Report</div>
-                                <small class="text-muted">Riwayat alert dan status penanganan</small>
+                                <small class="text-muted">Alert history and handling status</small>
                             </div>
                         </div>
                     </a>
@@ -114,7 +114,7 @@ require_once __DIR__ . '/includes/header.php';
                             <i class="fas fa-wrench fa-lg mr-3 mt-1 text-warning"></i>
                             <div>
                                 <div class="font-weight-bold">Maintenance Report</div>
-                                <small class="text-muted">Catatan perawatan dan perbaikan mesin</small>
+                                <small class="text-muted">Machine maintenance and repair records</small>
                             </div>
                         </div>
                     </a>
@@ -124,7 +124,7 @@ require_once __DIR__ . '/includes/header.php';
                             <i class="fas fa-bolt fa-lg mr-3 mt-1 text-success"></i>
                             <div>
                                 <div class="font-weight-bold">Energy Report</div>
-                                <small class="text-muted">Data konsumsi energi dari sensor</small>
+                                <small class="text-muted">Energy consumption data from sensors</small>
                             </div>
                         </div>
                     </a>
@@ -134,7 +134,7 @@ require_once __DIR__ . '/includes/header.php';
                             <i class="fas fa-wave-square fa-lg mr-3 mt-1 text-info"></i>
                             <div>
                                 <div class="font-weight-bold">Vibration Report</div>
-                                <small class="text-muted">Data pembacaan sensor vibrasi mesin</small>
+                                <small class="text-muted">Machine vibration sensor readings</small>
                             </div>
                         </div>
                     </a>
@@ -151,8 +151,8 @@ require_once __DIR__ . '/includes/header.php';
         <div id="defaultState" class="card shadow">
             <div class="card-body text-center py-5">
                 <i class="fas fa-arrow-left fa-3x text-gray-300 mb-3"></i>
-                <h5 class="text-gray-500">&larr; Pilih jenis laporan untuk memulai</h5>
-                <p class="text-muted">Klik salah satu jenis laporan di sebelah kiri untuk menampilkan konfigurasi dan opsi export.</p>
+                <h5 class="text-gray-500">&larr; Select a report type to get started</h5>
+                <p class="text-muted">Click one of the report types on the left to display configuration and export options.</p>
             </div>
         </div>
 
@@ -170,17 +170,17 @@ require_once __DIR__ . '/includes/header.php';
                 <!-- Config Form -->
                 <div class="row form-row mb-3">
                     <div class="col-md-3">
-                        <label class="small font-weight-bold text-gray-700">Dari Tanggal</label>
+                        <label class="small font-weight-bold text-gray-700">From Date</label>
                         <input type="date" id="fromDate" class="form-control form-control-sm">
                     </div>
                     <div class="col-md-3">
-                        <label class="small font-weight-bold text-gray-700">Sampai Tanggal</label>
+                        <label class="small font-weight-bold text-gray-700">To Date</label>
                         <input type="date" id="toDate" class="form-control form-control-sm">
                     </div>
                     <div class="col-md-3">
-                        <label class="small font-weight-bold text-gray-700">Mesin</label>
+                        <label class="small font-weight-bold text-gray-700">Machine</label>
                         <select id="machineSelect" class="form-control form-control-sm">
-                            <option value="">Semua Mesin</option>
+                            <option value="">All Machines</option>
                             <?php foreach ($machines as $m): ?>
                             <option value="<?php echo (int)$m['id']; ?>">
                                 <?php echo htmlspecialchars($m['name']); ?>
@@ -208,10 +208,10 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
 
                 <button id="btnGenerate" class="btn btn-primary btn-sm">
-                    <i class="fas fa-play mr-1"></i> Generate Laporan
+                    <i class="fas fa-play mr-1"></i> Generate Report
                 </button>
                 <span id="loadingSpinner" class="ml-2" style="display:none;">
-                    <i class="fas fa-spinner fa-spin text-primary"></i> Memuat data...
+                    <i class="fas fa-spinner fa-spin text-primary"></i> Loading data...
                 </span>
 
             </div>
@@ -221,7 +221,7 @@ require_once __DIR__ . '/includes/header.php';
         <div id="previewCard" class="card shadow mt-3" style="display:none;">
             <div class="card-header py-2 d-flex align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-gray-700">
-                    <i class="fas fa-table mr-1"></i> Hasil Laporan
+                    <i class="fas fa-table mr-1"></i> Report Results
                 </h6>
                 <small class="text-muted" id="previewMeta"></small>
             </div>
@@ -239,10 +239,10 @@ require_once __DIR__ . '/includes/header.php';
         <div class="card shadow">
             <div class="card-header py-3 d-flex align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">
-                    <i class="fas fa-history mr-1"></i> Riwayat Generate Sesi Ini
+                    <i class="fas fa-history mr-1"></i> Generation History This Session
                 </h6>
                 <button class="btn btn-sm btn-outline-secondary" id="btnClearHistory">
-                    <i class="fas fa-trash-alt mr-1"></i> Hapus Riwayat
+                    <i class="fas fa-trash-alt mr-1"></i> Clear History
                 </button>
             </div>
             <div class="card-body p-0">
@@ -251,18 +251,18 @@ require_once __DIR__ . '/includes/header.php';
                         <thead class="thead-light">
                             <tr>
                                 <th>#</th>
-                                <th>Jenis Laporan</th>
-                                <th>Periode</th>
+                                <th>Report Type</th>
+                                <th>Period</th>
                                 <th>Format</th>
-                                <th>Mesin</th>
-                                <th>Digenerate Pada</th>
-                                <th>Aksi</th>
+                                <th>Machine</th>
+                                <th>Generated At</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="historyBody">
                             <tr id="historyEmpty">
                                 <td colspan="7" class="text-center text-muted py-3">
-                                    <i class="fas fa-info-circle mr-1"></i> Belum ada laporan yang digenerate sesi ini.
+                                    <i class="fas fa-info-circle mr-1"></i> No reports have been generated this session.
                                 </td>
                             </tr>
                         </tbody>
@@ -286,27 +286,27 @@ require_once __DIR__ . '/includes/header.php';
     var reportMeta = {
         oee_summary: {
             title: 'OEE Summary',
-            desc:  'Ringkasan nilai OEE harian per mesin (availability, performance, quality)',
+            desc:  'Daily OEE value summary per machine (availability, performance, quality)',
             icon:  'fas fa-chart-bar'
         },
         alert_report: {
             title: 'Alert Report',
-            desc:  'Riwayat alert sensor beserta status penanganan',
+            desc:  'Sensor alert history and handling status',
             icon:  'fas fa-bell'
         },
         maintenance_report: {
             title: 'Maintenance Report',
-            desc:  'Catatan pekerjaan perawatan dan perbaikan mesin',
+            desc:  'Machine maintenance and repair work records',
             icon:  'fas fa-wrench'
         },
         e_report: {
             title: 'Energy Report',
-            desc:  'Data konsumsi energi (tegangan, arus, daya) dari sensor',
+            desc:  'Energy consumption data (voltage, current, power) from sensors',
             icon:  'fas fa-bolt'
         },
         vibration_report: {
             title: 'Vibration Report',
-            desc:  'Data pembacaan sensor vibrasi mesin',
+            desc:  'Machine vibration sensor readings',
             icon:  'fas fa-wave-square'
         }
     };
@@ -371,7 +371,7 @@ require_once __DIR__ . '/includes/header.php';
     /* ------------------------------------------------------------------ */
     document.getElementById('btnGenerate').addEventListener('click', function () {
         if (!currentType) {
-            alert('Pilih jenis laporan terlebih dahulu.');
+            alert('Please select a report type first.');
             return;
         }
 
@@ -383,7 +383,7 @@ require_once __DIR__ . '/includes/header.php';
         var format       = document.querySelector('input[name="reportFormat"]:checked').value;
 
         if (!fromDate || !toDate) {
-            alert('Harap isi tanggal dari dan sampai.');
+            alert('Please fill in the from and to dates.');
             return;
         }
 
@@ -397,7 +397,7 @@ require_once __DIR__ . '/includes/header.php';
             machine:      machineId,
             machineLabel: machineLabel,
             format:       format,
-            generatedAt:  new Date().toLocaleString('id-ID')
+            generatedAt:  new Date().toLocaleString('en-US')
         };
         sessionHistory.unshift(entry);
         renderHistory();
@@ -440,7 +440,7 @@ require_once __DIR__ . '/includes/header.php';
                 if (!res || !res.success) {
                     document.getElementById('reportPreview').innerHTML =
                         '<div class="alert alert-warning m-3"><i class="fas fa-exclamation-triangle mr-2"></i>' +
-                        escHtml((res && res.message) || 'Terjadi kesalahan.') + '</div>';
+                        escHtml((res && res.message) || 'An error occurred.') + '</div>';
                     return;
                 }
 
@@ -462,7 +462,7 @@ require_once __DIR__ . '/includes/header.php';
                 }
 
                 document.getElementById('reportPreview').innerHTML = html ||
-                    '<div class="alert alert-info m-3">Tidak ada data untuk parameter yang dipilih.</div>';
+                    '<div class="alert alert-info m-3">No data available for the selected parameters.</div>';
             })
             .fail(function (xhr) {
                 spinner.style.display = 'none';
@@ -470,7 +470,7 @@ require_once __DIR__ . '/includes/header.php';
                 document.getElementById('previewCard').style.display = '';
                 document.getElementById('reportPreview').innerHTML =
                     '<div class="alert alert-danger m-3"><i class="fas fa-times-circle mr-2"></i>' +
-                    'Gagal memuat laporan. HTTP ' + xhr.status + ' — ' + escHtml(xhr.responseText.substring(0,200)) + '</div>';
+                    'Failed to load report. HTTP ' + xhr.status + ' — ' + escHtml(xhr.responseText.substring(0,200)) + '</div>';
             });
     });
 
@@ -483,7 +483,7 @@ require_once __DIR__ . '/includes/header.php';
         if (sessionHistory.length === 0) {
             tbody.innerHTML =
                 '<tr id="historyEmpty"><td colspan="7" class="text-center text-muted py-3">' +
-                '<i class="fas fa-info-circle mr-1"></i> Belum ada laporan yang digenerate sesi ini.</td></tr>';
+                '<i class="fas fa-info-circle mr-1"></i> No reports have been generated this session.</td></tr>';
             return;
         }
 
@@ -575,12 +575,12 @@ require_once __DIR__ . '/includes/header.php';
     /* ------------------------------------------------------------------ */
     function renderOeeSummary(d) {
         if (!d || !d.summary || d.summary.length === 0)
-            return '<div class="alert alert-info m-3">Tidak ada data OEE untuk periode yang dipilih.</div>';
+            return '<div class="alert alert-info m-3">No OEE data available for the selected period.</div>';
 
         var h = '<div class="p-3">';
-        h += '<h6 class="font-weight-bold mb-3"><i class="fas fa-table mr-2 text-primary"></i>Ringkasan OEE per Mesin</h6>';
+        h += '<h6 class="font-weight-bold mb-3"><i class="fas fa-table mr-2 text-primary"></i>OEE Summary per Machine</h6>';
         h += '<div class="table-responsive mb-4"><table class="table table-bordered table-sm table-hover">';
-        h += '<thead class="thead-dark"><tr><th>Mesin</th><th>Hari</th><th>Availability</th>' +
+        h += '<thead class="thead-dark"><tr><th>Machine</th><th>Days</th><th>Availability</th>' +
              '<th>Performance</th><th>Quality</th><th>Avg OEE</th><th>Min OEE</th><th>Max OEE</th>' +
              '<th>Planned (min)</th><th>Run (min)</th></tr></thead><tbody>';
         d.summary.forEach(function(r) {
@@ -601,9 +601,9 @@ require_once __DIR__ . '/includes/header.php';
         h += '</tbody></table></div>';
 
         if (d.trend && d.trend.length > 0) {
-            h += '<h6 class="font-weight-bold mb-3"><i class="fas fa-chart-line mr-2 text-primary"></i>Tren OEE Harian</h6>';
+            h += '<h6 class="font-weight-bold mb-3"><i class="fas fa-chart-line mr-2 text-primary"></i>Daily OEE Trend</h6>';
             h += '<div class="table-responsive"><table class="table table-bordered table-sm table-hover">';
-            h += '<thead class="thead-light"><tr><th>Tanggal</th><th>Availability</th><th>Performance</th><th>Quality</th><th>OEE Score</th></tr></thead><tbody>';
+            h += '<thead class="thead-light"><tr><th>Date</th><th>Availability</th><th>Performance</th><th>Quality</th><th>OEE Score</th></tr></thead><tbody>';
             d.trend.forEach(function(r) {
                 h += '<tr><td>' + escHtml(r.snap_date) + '</td>' +
                      '<td class="text-center">' + r.availability + '%</td>' +
@@ -622,7 +622,7 @@ require_once __DIR__ . '/includes/header.php';
     /* ------------------------------------------------------------------ */
     function renderAlertReport(d) {
         if (!d || !d.list || d.list.length === 0)
-            return '<div class="alert alert-info m-3">Tidak ada alert untuk periode yang dipilih.</div>';
+            return '<div class="alert alert-info m-3">No alerts for the selected period.</div>';
 
         var total = 0, critical = 0, warning = 0;
         (d.stats || []).forEach(function(s) {
@@ -633,15 +633,15 @@ require_once __DIR__ . '/includes/header.php';
 
         var h = '<div class="p-3">';
         h += '<div class="row mb-3">' +
-             '<div class="col-auto"><div class="card border-left-primary shadow-sm py-2 px-3"><div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Alert</div><div class="h5 mb-0 font-weight-bold">' + total + '</div></div></div>' +
+             '<div class="col-auto"><div class="card border-left-primary shadow-sm py-2 px-3"><div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Alerts</div><div class="h5 mb-0 font-weight-bold">' + total + '</div></div></div>' +
              '<div class="col-auto"><div class="card border-left-danger shadow-sm py-2 px-3"><div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Critical</div><div class="h5 mb-0 font-weight-bold text-danger">' + critical + '</div></div></div>' +
              '<div class="col-auto"><div class="card border-left-warning shadow-sm py-2 px-3"><div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Warning</div><div class="h5 mb-0 font-weight-bold text-warning">' + warning + '</div></div></div>' +
              '</div>';
 
         if (d.by_machine && d.by_machine.length > 0) {
-            h += '<h6 class="font-weight-bold mb-2"><i class="fas fa-cogs mr-2 text-danger"></i>Alert per Mesin</h6>';
+            h += '<h6 class="font-weight-bold mb-2"><i class="fas fa-cogs mr-2 text-danger"></i>Alerts per Machine</h6>';
             h += '<div class="table-responsive mb-4"><table class="table table-sm table-bordered table-hover">';
-            h += '<thead class="thead-light"><tr><th>Mesin</th><th>Total</th><th>Critical</th><th>Warning</th></tr></thead><tbody>';
+            h += '<thead class="thead-light"><tr><th>Machine</th><th>Total</th><th>Critical</th><th>Warning</th></tr></thead><tbody>';
             d.by_machine.forEach(function(r) {
                 h += '<tr><td>' + escHtml(r.machine_name) + '</td><td><b>' + r.alert_count + '</b></td>' +
                      '<td><span class="badge badge-danger">' + r.critical + '</span></td>' +
@@ -650,13 +650,13 @@ require_once __DIR__ . '/includes/header.php';
             h += '</tbody></table></div>';
         }
 
-        h += '<h6 class="font-weight-bold mb-2"><i class="fas fa-list mr-2 text-danger"></i>Daftar Alert</h6>';
+        h += '<h6 class="font-weight-bold mb-2"><i class="fas fa-list mr-2 text-danger"></i>Alert List</h6>';
         h += '<div class="table-responsive"><table class="table table-sm table-bordered table-hover">';
-        h += '<thead class="thead-light"><tr><th>#</th><th>Mesin</th><th>Sensor</th><th>Nilai</th><th>Severity</th><th>Status</th><th>Waktu</th></tr></thead><tbody>';
+        h += '<thead class="thead-light"><tr><th>#</th><th>Machine</th><th>Sensor</th><th>Value</th><th>Severity</th><th>Status</th><th>Time</th></tr></thead><tbody>';
         d.list.forEach(function(r) {
             var sevCls = r.severity === 'critical' ? 'danger' : (r.severity === 'warning' ? 'warning' : 'info');
             var ackBadge = r.acknowledged
-                ? '<span class="badge badge-success">Diakui</span>'
+                ? '<span class="badge badge-success">Acknowledged</span>'
                 : '<span class="badge badge-secondary">Pending</span>';
             h += '<tr><td class="small text-muted">' + r.id + '</td>' +
                  '<td>' + escHtml(r.machine_name) + '</td>' +
@@ -675,12 +675,12 @@ require_once __DIR__ . '/includes/header.php';
     /* ------------------------------------------------------------------ */
     function renderEnergyReport(d) {
         if (!d || !d.summary || d.summary.length === 0)
-            return '<div class="alert alert-info m-3">Tidak ada data energi untuk periode yang dipilih.</div>';
+            return '<div class="alert alert-info m-3">No energy data available for the selected period.</div>';
 
         var h = '<div class="p-3">';
-        h += '<h6 class="font-weight-bold mb-3"><i class="fas fa-bolt mr-2 text-warning"></i>Ringkasan Energi per Mesin</h6>';
+        h += '<h6 class="font-weight-bold mb-3"><i class="fas fa-bolt mr-2 text-warning"></i>Energy Summary per Machine</h6>';
         h += '<div class="table-responsive mb-4"><table class="table table-bordered table-sm table-hover">';
-        h += '<thead class="thead-dark"><tr><th>Mesin</th><th>Readings</th><th>Avg kWh</th>' +
+        h += '<thead class="thead-dark"><tr><th>Machine</th><th>Readings</th><th>Avg kWh</th>' +
              '<th>Total kWh</th><th>Avg Voltage (V)</th><th>Avg Current (A)</th>' +
              '<th>Avg Temp (°C)</th><th>Avg Hum (%)</th></tr></thead><tbody>';
         d.summary.forEach(function(r) {
@@ -696,9 +696,9 @@ require_once __DIR__ . '/includes/header.php';
         h += '</tbody></table></div>';
 
         if (d.trend && d.trend.length > 0) {
-            h += '<h6 class="font-weight-bold mb-2"><i class="fas fa-chart-area mr-2 text-warning"></i>Tren Energi Harian</h6>';
+            h += '<h6 class="font-weight-bold mb-2"><i class="fas fa-chart-area mr-2 text-warning"></i>Daily Energy Trend</h6>';
             h += '<div class="table-responsive"><table class="table table-sm table-bordered table-hover">';
-            h += '<thead class="thead-light"><tr><th>Tanggal</th><th>Avg kWh</th><th>Total kWh</th></tr></thead><tbody>';
+            h += '<thead class="thead-light"><tr><th>Date</th><th>Avg kWh</th><th>Total kWh</th></tr></thead><tbody>';
             d.trend.forEach(function(r) {
                 h += '<tr><td>' + escHtml(r.day) + '</td><td class="text-right">' + r.avg_kwh + '</td><td class="text-right font-weight-bold">' + r.sum_kwh + '</td></tr>';
             });
@@ -713,13 +713,13 @@ require_once __DIR__ . '/includes/header.php';
     /* ------------------------------------------------------------------ */
     function renderMaintenanceReport(d) {
         if (!d || !d.records || d.records.length === 0)
-            return '<div class="alert alert-info m-3">Tidak ada data maintenance untuk periode yang dipilih.</div>';
+            return '<div class="alert alert-info m-3">No maintenance data available for the selected period.</div>';
 
         var h = '<div class="p-3">';
-        h += '<h6 class="font-weight-bold mb-3"><i class="fas fa-wrench mr-2 text-warning"></i>Riwayat Maintenance</h6>';
+        h += '<h6 class="font-weight-bold mb-3"><i class="fas fa-wrench mr-2 text-warning"></i>Maintenance History</h6>';
         h += '<div class="table-responsive"><table class="table table-sm table-bordered table-hover">';
-        h += '<thead class="thead-dark"><tr><th>Tanggal</th><th>Mesin</th><th>Jenis</th>' +
-             '<th>Teknisi</th><th>Durasi (min)</th><th>Deskripsi</th></tr></thead><tbody>';
+        h += '<thead class="thead-dark"><tr><th>Date</th><th>Machine</th><th>Type</th>' +
+             '<th>Technician</th><th>Duration (min)</th><th>Description</th></tr></thead><tbody>';
         d.records.forEach(function(r) {
             h += '<tr><td>' + escHtml(r.maint_date) + '</td>' +
                  '<td>' + escHtml(r.machine_name) + '</td>' +
@@ -737,12 +737,12 @@ require_once __DIR__ . '/includes/header.php';
     /* ------------------------------------------------------------------ */
     function renderVibrationReport(d) {
         if (!d || !d.readings || d.readings.length === 0)
-            return '<div class="alert alert-info m-3">Tidak ada data vibrasi untuk periode yang dipilih.</div>';
+            return '<div class="alert alert-info m-3">No vibration data available for the selected period.</div>';
 
         var h = '<div class="p-3">';
-        h += '<h6 class="font-weight-bold mb-3"><i class="fas fa-wave-square mr-2 text-info"></i>Data Vibrasi</h6>';
+        h += '<h6 class="font-weight-bold mb-3"><i class="fas fa-wave-square mr-2 text-info"></i>Vibration Data</h6>';
         h += '<div class="table-responsive"><table class="table table-sm table-bordered table-hover">';
-        h += '<thead class="thead-dark"><tr><th>Waktu</th><th>Mesin</th><th>Sensor 1</th>' +
+        h += '<thead class="thead-dark"><tr><th>Time</th><th>Machine</th><th>Sensor 1</th>' +
              '<th>Sensor 2</th><th>Sensor 3</th><th>RMS</th><th>Status</th></tr></thead><tbody>';
         d.readings.forEach(function(r) {
             var stCls = r.status === 'normal' ? 'success' : (r.status === 'warning' ? 'warning' : 'danger');

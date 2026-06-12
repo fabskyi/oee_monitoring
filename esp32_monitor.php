@@ -115,10 +115,10 @@ require_once 'includes/header.php';
                         <i class="fas fa-microchip text-primary mr-2"></i>ESP32 Device Monitor
                     </h1>
                     <div class="d-flex align-items-center">
-                        <span class="mr-3 text-muted small" id="lastRefreshLabel">Terakhir refresh: 0 detik lalu</span>
+                        <span class="mr-3 text-muted small" id="lastRefreshLabel">Last refresh: 0 seconds ago</span>
                         <?php if (($currentRole ?? 'operator') === 'admin'): ?>
                         <button class="btn btn-primary btn-sm shadow-sm" data-toggle="modal" data-target="#addDeviceModal">
-                            <i class="fas fa-plus fa-sm mr-1"></i>Tambah Device
+                            <i class="fas fa-plus fa-sm mr-1"></i>Add Device
                         </button>
                         <?php endif; ?>
                     </div>
@@ -181,7 +181,7 @@ require_once 'includes/header.php';
                     <?php if (empty($devices)): ?>
                     <div class="col-12">
                         <div class="alert alert-info">
-                            <i class="fas fa-info-circle mr-1"></i>Belum ada device ESP32 yang terdaftar.
+                            <i class="fas fa-info-circle mr-1"></i>No ESP32 devices registered yet.
                         </div>
                     </div>
                     <?php else: ?>
@@ -285,7 +285,7 @@ require_once 'includes/header.php';
                 <div class="card shadow mb-4">
                     <div class="card-header py-3 d-flex justify-content-between align-items-center">
                         <h6 class="m-0 font-weight-bold text-primary">
-                            <i class="fas fa-table mr-1"></i>Live Sensor Data (50 terbaru)
+                            <i class="fas fa-table mr-1"></i>Live Sensor Data (Latest 50)
                         </h6>
                         <span class="badge badge-secondary" id="tableRefreshBadge">Auto-refresh 15s</span>
                     </div>
@@ -294,7 +294,7 @@ require_once 'includes/header.php';
                             <table class="table table-bordered table-sm" id="liveDataTable" width="100%">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th>Waktu</th>
+                                        <th>Time</th>
                                         <th>Device / Machine</th>
                                         <th>V_R (V)</th>
                                         <th>A_R (A)</th>
@@ -304,7 +304,7 @@ require_once 'includes/header.php';
                                     </tr>
                                 </thead>
                                 <tbody id="liveDataBody">
-                                    <tr><td colspan="7" class="text-center text-muted">Memuat data...</td></tr>
+                                    <tr><td colspan="7" class="text-center text-muted">Loading data...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -329,7 +329,7 @@ require_once 'includes/header.php';
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addDeviceModalLabel">
-                    <i class="fas fa-microchip mr-1"></i>Tambah Device ESP32
+                    <i class="fas fa-microchip mr-1"></i>Add ESP32 Device
                 </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -344,7 +344,7 @@ require_once 'includes/header.php';
                     <div class="form-group">
                         <label>Machine</label>
                         <select class="form-control" id="form_machine_id">
-                            <option value="">-- Pilih Machine --</option>
+                            <option value="">-- Select Machine --</option>
                             <?php foreach ($machines as $m): ?>
                             <option value="<?= (int)$m['id'] ?>"><?= htmlspecialchars($m['name']) ?></option>
                             <?php endforeach; ?>
@@ -365,9 +365,9 @@ require_once 'includes/header.php';
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="btnSaveDevice">
-                    <i class="fas fa-save mr-1"></i>Simpan
+                    <i class="fas fa-save mr-1"></i>Save
                 </button>
             </div>
         </div>
@@ -434,7 +434,7 @@ $(document).ready(function () {
         $('#liveDataBody').empty();
 
         if (!readings || readings.length === 0) {
-            $('#liveDataBody').html('<tr><td colspan="7" class="text-center text-muted">Tidak ada data</td></tr>');
+            $('#liveDataBody').html('<tr><td colspan="7" class="text-center text-muted">No data</td></tr>');
             return;
         }
 
@@ -496,7 +496,7 @@ $(document).ready(function () {
                 }
             },
             error: function() {
-                $('#liveDataBody').html('<tr><td colspan="7" class="text-center text-danger">Gagal memuat data sensor.</td></tr>');
+                $('#liveDataBody').html('<tr><td colspan="7" class="text-center text-danger">Failed to load sensor data.</td></tr>');
             }
         });
     }
@@ -558,7 +558,7 @@ $(document).ready(function () {
     var refreshSeconds = 0;
     setInterval(function () {
         refreshSeconds++;
-        $('#lastRefreshLabel').text('Terakhir refresh: ' + refreshSeconds + ' detik lalu');
+        $('#lastRefreshLabel').text('Last refresh: ' + refreshSeconds + ' seconds ago');
     }, 1000);
 
     /* ── Ping button ───────────────────────────────────────────────────────── */
@@ -574,12 +574,12 @@ $(document).ready(function () {
                 col.find('.status-dot').removeClass('offline').addClass('online pulse');
                 col.find('.device-status-text').text('Online');
                 col.find('.card').removeClass('border-danger').addClass('border-success');
-                showToast('Ping', 'Device ' + deviceId + ' merespons!', 'success');
+                showToast('Ping', 'Device ' + deviceId + ' responded!', 'success');
             } else {
-                showToast('Ping Gagal', 'Device ' + deviceId + ' tidak merespons.', 'danger');
+                showToast('Ping Failed', 'Device ' + deviceId + ' did not respond.', 'danger');
             }
         }).fail(function () {
-            showToast('Ping Error', 'Gagal menghubungi API.', 'danger');
+            showToast('Ping Error', 'Failed to contact API.', 'danger');
         }).always(function () {
             btn.prop('disabled', false).html('<i class="fas fa-satellite-dish mr-1"></i>Ping');
         });
@@ -589,7 +589,7 @@ $(document).ready(function () {
     $('#btnSaveDevice').on('click', function () {
         var deviceId = $.trim($('#form_device_id').val());
         if (!deviceId) {
-            showToast('Validasi', 'Device ID wajib diisi.', 'warning');
+            showToast('Validation', 'Device ID is required.', 'warning');
             $('#form_device_id').focus();
             return;
         }
@@ -603,7 +603,7 @@ $(document).ready(function () {
         };
 
         var btn = $(this);
-        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Menyimpan...');
+        btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Saving...');
 
         $.ajax({
             url         : 'api/esp32.php?action=register',
@@ -612,20 +612,20 @@ $(document).ready(function () {
             data        : JSON.stringify(payload),
             success     : function (res) {
                 if (res && res.success) {
-                    showToast('Sukses', 'Device berhasil disimpan. Memuat ulang...', 'success');
+                    showToast('Success', 'Device saved successfully. Reloading...', 'success');
                     $('#addDeviceModal').modal('hide');
                     setTimeout(function () { location.reload(); }, 1500);
                 } else {
-                    showToast('Gagal', res.message || 'Terjadi kesalahan.', 'danger');
+                    showToast('Failed', res.message || 'An error occurred.', 'danger');
                 }
             },
             error: function (xhr) {
-                var msg = 'Gagal menyimpan device.';
+                var msg = 'Failed to save device.';
                 try { msg = JSON.parse(xhr.responseText).message || msg; } catch(e) {}
                 showToast('Error', msg, 'danger');
             },
             complete: function () {
-                btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i>Simpan');
+                btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i>Save');
             }
         });
     });

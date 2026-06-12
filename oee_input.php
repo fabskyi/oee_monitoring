@@ -1,7 +1,7 @@
 <?php
 // ============================================================
-//  oee_input.php — Input & Konfigurasi OEE
-//  Operator-friendly: Jam Kerja · Target Plan · Produksi/Reject
+//  oee_input.php — OEE Input & Configuration
+//  Operator-friendly: Working Hours · Target Plan · Production/Reject
 // ============================================================
 require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/auth_check.php';
@@ -44,13 +44,22 @@ tr.s4 td:first-child { border-left:3px solid #e74a3b; }
                border:1px solid #ffc107; border-radius:10px;
                padding:1px 7px; font-size:.68rem; font-weight:600; }
 .btn-add-break { font-size:.68rem; padding:1px 7px; border-radius:10px; }
+/* ── Auto/Manual mode toggle ─────────────────────────────── */
+.prod-mode-toggle .btn { font-size:.72rem; padding:2px 9px; border-radius:4px; line-height:1.5; }
+.prod-mode-toggle .btn.active { font-weight:700; }
+.prod-auto-cell  { background:#e8f4fd !important; cursor:default !important;
+                   border-bottom:1px solid #aed6f1 !important; color:#1a5276; }
+.prod-auto-cell .fa-robot { color:#2e86c1; margin-right:3px; font-size:.7rem; }
+#manualWarning   { background:#fff3cd; border:1px solid #ffc107; border-radius:4px;
+                   font-size:.74rem; color:#856404; padding:4px 8px; margin-top:4px; }
+#esp32SyncBar    { font-size:.7rem; color:#555; margin-top:3px; }
 </style>
 
 <!-- ── Heading ───────────────────────────────────────────────── -->
 <div class="d-flex flex-wrap align-items-center justify-content-between mb-3" style="gap:8px;">
     <div>
         <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-clipboard-list mr-2"></i>Input OEE</h1>
-        <small class="text-muted">Atur jam kerja, target, dan produksi tanpa perlu administrator</small>
+        <small class="text-muted">Manage working hours, targets, and production without needing an administrator</small>
     </div>
     <div class="d-flex flex-wrap align-items-center" style="gap:6px;">
         <select id="selMachine" class="form-control form-control-sm" style="width:160px;">
@@ -63,37 +72,37 @@ tr.s4 td:first-child { border-left:3px solid #e74a3b; }
         <input type="date" id="selDate" class="form-control form-control-sm" style="width:140px;"
                value="<?= htmlspecialchars($dateInput) ?>">
         <button class="btn btn-primary btn-sm" onclick="loadAll()">
-            <i class="fas fa-sync-alt mr-1"></i>Muat
+            <i class="fas fa-sync-alt mr-1"></i>Load
         </button>
     </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
-<!--  ROW 1 : OEE Summary (atas) -->
+<!--  ROW 1 : OEE Summary (top) -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <div class="row mb-3" id="oeeRow">
-    <!-- diisi JS -->
+    <!-- filled by JS -->
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
-<!--  ROW 2 : 3 panel berdampingan -->
+<!--  ROW 2 : 3 side-by-side panels -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <div class="row">
 
-    <!-- ── PANEL 1: Jam Kerja + Istirahat ────────────────────── -->
+    <!-- ── PANEL 1: Working Hours + Breaks ────────────────────── -->
     <div class="col-lg-4 mb-4">
         <div class="card shadow h-100">
             <div class="card-header py-2 d-flex align-items-center justify-content-between"
                  style="background:#f0f3fa;">
                 <h6 class="m-0 font-weight-bold text-primary">
-                    <i class="fas fa-clock mr-1"></i>Jam Kerja
+                    <i class="fas fa-clock mr-1"></i>Working Hours
                     <small class="text-muted font-weight-normal ml-1" style="font-size:.7rem;">
                         (Availability)
                     </small>
                 </h6>
                 <button class="btn btn-sm btn-outline-primary" style="font-size:.75rem;"
                         onclick="openAddShift()">
-                    <i class="fas fa-plus mr-1"></i>Tambah Shift
+                    <i class="fas fa-plus mr-1"></i>Add Shift
                 </button>
             </div>
             <div class="card-body p-0">
@@ -101,32 +110,32 @@ tr.s4 td:first-child { border-left:3px solid #e74a3b; }
                     <thead class="thead-light">
                         <tr>
                             <th style="width:28px;"></th>
-                            <th>Nama Shift</th>
-                            <th>Mulai</th>
-                            <th>Selesai</th>
-                            <th>Netto</th>
+                            <th>Shift Name</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Net</th>
                             <th style="width:28px;"></th>
                         </tr>
                     </thead>
                     <tbody id="bodyShift">
-                        <tr><td colspan="6" class="text-center text-muted py-3">Memuat…</td></tr>
+                        <tr><td colspan="6" class="text-center text-muted py-3">Loading…</td></tr>
                     </tbody>
                 </table>
             </div>
             <div class="card-footer py-1 px-3 text-muted" style="font-size:.72rem;">
                 <i class="fas fa-info-circle mr-1"></i>
-                Klik <i class="fas fa-coffee text-warning"></i> untuk kelola istirahat per shift ·
-                Istirahat <strong>tidak</strong> mengurangi Availability
+                Click <i class="fas fa-coffee text-warning"></i> to manage breaks per shift ·
+                Breaks do <strong>not</strong> reduce Availability
             </div>
         </div>
     </div>
 
-    <!-- ── PANEL 2: Target Plan ────────────────────────────── -->
+    <!-- ── PANEL 2: Production Target ────────────────────────────── -->
     <div class="col-lg-4 mb-4">
         <div class="card shadow h-100">
             <div class="card-header py-2" style="background:#f0f3fa;">
                 <h6 class="m-0 font-weight-bold text-success">
-                    <i class="fas fa-bullseye mr-1"></i>Target Produksi
+                    <i class="fas fa-bullseye mr-1"></i>Production Target
                     <small class="text-muted font-weight-normal ml-1" style="font-size:.7rem;">
                         (Performance)
                     </small>
@@ -138,33 +147,63 @@ tr.s4 td:first-child { border-left:3px solid #e74a3b; }
                         <tr>
                             <th>Shift</th>
                             <th>Default</th>
-                            <th>Target Hari Ini <i class="fas fa-edit text-muted" style="font-size:.65rem;"></i></th>
-                            <th>Aktual</th>
-                            <th>Performa</th>
+                            <th>Today's Target <i class="fas fa-edit text-muted" style="font-size:.65rem;"></i></th>
+                            <th>Actual</th>
+                            <th>Performance</th>
                         </tr>
                     </thead>
                     <tbody id="bodyPlan">
-                        <tr><td colspan="5" class="text-center text-muted py-3">Memuat…</td></tr>
+                        <tr><td colspan="5" class="text-center text-muted py-3">Loading…</td></tr>
                     </tbody>
                 </table>
             </div>
             <div class="card-footer py-1 px-3 text-muted" style="font-size:.72rem;">
                 <i class="fas fa-info-circle mr-1"></i>
-                Klik kolom "Target Hari Ini" untuk mengubah target khusus hari ini
+                Click the "Today's Target" column to change the target for today only
             </div>
         </div>
     </div>
 
-    <!-- ── PANEL 3: Input Produksi & Reject ───────────────── -->
+    <!-- ── PANEL 3: Production & Reject Input ───────────────── -->
     <div class="col-lg-4 mb-4">
         <div class="card shadow h-100">
             <div class="card-header py-2" style="background:#f0f3fa;">
-                <h6 class="m-0 font-weight-bold text-danger">
-                    <i class="fas fa-boxes mr-1"></i>Produksi & Reject
-                    <small class="text-muted font-weight-normal ml-1" style="font-size:.7rem;">
-                        (Quality)
-                    </small>
-                </h6>
+                <div class="d-flex flex-wrap align-items-center justify-content-between" style="gap:4px;">
+                    <h6 class="m-0 font-weight-bold text-danger">
+                        <i class="fas fa-boxes mr-1"></i>Production &amp; Reject
+                        <small class="text-muted font-weight-normal ml-1" style="font-size:.7rem;">
+                            (Quality)
+                        </small>
+                    </h6>
+                    <div class="d-flex align-items-center" style="gap:5px;">
+                        <!-- Mode toggle -->
+                        <div class="btn-group prod-mode-toggle" role="group">
+                            <button type="button" id="btnModeAuto"
+                                    class="btn btn-sm btn-primary active"
+                                    onclick="setProdMode('auto')">
+                                <i class="fas fa-robot mr-1"></i>Auto (ESP32)
+                            </button>
+                            <button type="button" id="btnModeManual"
+                                    class="btn btn-sm btn-outline-secondary"
+                                    onclick="setProdMode('manual')">
+                                <i class="fas fa-pencil-alt mr-1"></i>Manual
+                            </button>
+                        </div>
+                        <!-- Fetch button (auto mode only) -->
+                        <button id="btnFetchEsp32" class="btn btn-sm btn-outline-info"
+                                style="font-size:.72rem;padding:2px 7px;"
+                                onclick="fetchEsp32All()" title="Fetch latest from ESP32">
+                            <i class="fas fa-sync-alt mr-1"></i>Fetch
+                        </button>
+                    </div>
+                </div>
+                <!-- Sync bar / manual warning -->
+                <div id="esp32SyncBar" class="text-muted">
+                    <i class="fas fa-clock mr-1"></i>Last synced: —
+                </div>
+                <div id="manualWarning" style="display:none;">
+                    &#9888; Manual mode — sensor data overridden. Values will be saved as entered.
+                </div>
             </div>
             <div class="card-body p-0">
                 <table class="table table-sm mb-0" id="tblProd">
@@ -178,25 +217,25 @@ tr.s4 td:first-child { border-left:3px solid #e74a3b; }
                         </tr>
                     </thead>
                     <tbody id="bodyProd">
-                        <tr><td colspan="5" class="text-center text-muted py-3">Memuat…</td></tr>
+                        <tr><td colspan="5" class="text-center text-muted py-3">Loading…</td></tr>
                     </tbody>
                 </table>
             </div>
             <div class="card-footer py-1 px-3 text-muted" style="font-size:.72rem;">
                 <i class="fas fa-info-circle mr-1"></i>
-                Edit Output/Reject lalu <kbd>Enter</kbd> atau klik di luar — tersimpan otomatis
+                Edit Output/Reject then press <kbd>Enter</kbd> or click outside — saved automatically
             </div>
         </div>
     </div>
 </div>
 
-<!-- ── Operator & Catatan ─────────────────────────────────────── -->
+<!-- ── Operator & Notes ─────────────────────────────────────── -->
 <div class="row mb-4">
     <div class="col-lg-6">
         <div class="card shadow">
             <div class="card-header py-2" style="background:#f0f3fa;">
                 <h6 class="m-0 font-weight-bold text-secondary">
-                    <i class="fas fa-user-hard-hat mr-1"></i>Operator & Catatan
+                    <i class="fas fa-user-hard-hat mr-1"></i>Operator & Notes
                 </h6>
             </div>
             <div class="card-body py-3">
@@ -204,22 +243,22 @@ tr.s4 td:first-child { border-left:3px solid #e74a3b; }
                     <div class="col-md-5 mb-2">
                         <label class="small font-weight-bold">Shift</label>
                         <select id="noteShift" class="form-control form-control-sm">
-                            <option value="">Pilih shift…</option>
+                            <option value="">Select shift…</option>
                         </select>
                     </div>
                     <div class="col-md-7 mb-2">
-                        <label class="small font-weight-bold">Nama Operator</label>
+                        <label class="small font-weight-bold">Operator Name</label>
                         <input type="text" id="noteOperator" class="form-control form-control-sm"
-                               placeholder="Nama operator shift ini">
+                               placeholder="Operator name for this shift">
                     </div>
                     <div class="col-12 mb-2">
-                        <label class="small font-weight-bold">Catatan</label>
+                        <label class="small font-weight-bold">Notes</label>
                         <textarea id="noteText" class="form-control form-control-sm" rows="2"
-                                  placeholder="Catatan produksi, kendala, dll…"></textarea>
+                                  placeholder="Production notes, issues, etc…"></textarea>
                     </div>
                     <div class="col-12">
                         <button class="btn btn-secondary btn-sm" onclick="saveNotes()">
-                            <i class="fas fa-save mr-1"></i>Simpan Catatan
+                            <i class="fas fa-save mr-1"></i>Save Notes
                         </button>
                         <small id="noteStatus" class="ml-2 text-muted"></small>
                     </div>
@@ -231,12 +270,12 @@ tr.s4 td:first-child { border-left:3px solid #e74a3b; }
         <div class="card shadow h-100">
             <div class="card-header py-2" style="background:#f0f3fa;">
                 <h6 class="m-0 font-weight-bold text-secondary">
-                    <i class="fas fa-history mr-1"></i>Riwayat Perubahan Hari Ini
+                    <i class="fas fa-history mr-1"></i>Today's Change History
                 </h6>
             </div>
             <div class="card-body p-0">
                 <div id="auditLog" style="max-height:130px;overflow-y:auto;font-size:.75rem;padding:8px 12px;">
-                    <span class="text-muted">Belum ada perubahan sesi ini.</span>
+                    <span class="text-muted">No changes this session yet.</span>
                 </div>
             </div>
         </div>
@@ -244,47 +283,47 @@ tr.s4 td:first-child { border-left:3px solid #e74a3b; }
 </div>
 
 <!-- ════════════════════════════════════════════════════════════ -->
-<!--  MODAL: Tambah / Edit Shift -->
+<!--  MODAL: Add / Edit Shift -->
 <!-- ════════════════════════════════════════════════════════════ -->
 <div class="modal fade" id="modalShift" tabindex="-1">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
             <div class="modal-header py-2">
-                <h6 class="modal-title font-weight-bold" id="modalShiftTitle">Tambah Shift</h6>
+                <h6 class="modal-title font-weight-bold" id="modalShiftTitle">Add Shift</h6>
                 <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="mShiftId">
                 <div class="form-group mb-2">
-                    <label class="small font-weight-bold">No. Shift</label>
+                    <label class="small font-weight-bold">Shift No.</label>
                     <input type="number" id="mShiftNo" class="form-control form-control-sm"
                            min="1" max="4" placeholder="1">
                 </div>
                 <div class="form-group mb-2">
-                    <label class="small font-weight-bold">Nama Shift</label>
+                    <label class="small font-weight-bold">Shift Name</label>
                     <input type="text" id="mShiftName" class="form-control form-control-sm"
-                           placeholder="Shift Pagi">
+                           placeholder="Morning Shift">
                 </div>
                 <div class="form-row mb-2">
                     <div class="col">
-                        <label class="small font-weight-bold">Mulai</label>
+                        <label class="small font-weight-bold">Start</label>
                         <input type="time" id="mStart" class="form-control form-control-sm">
                     </div>
                     <div class="col">
-                        <label class="small font-weight-bold">Selesai</label>
+                        <label class="small font-weight-bold">End</label>
                         <input type="time" id="mEnd" class="form-control form-control-sm">
                     </div>
                 </div>
                 <div class="form-group mb-0">
-                    <label class="small font-weight-bold">Target Default (pcs)</label>
+                    <label class="small font-weight-bold">Default Target (pcs)</label>
                     <input type="number" id="mPlan" class="form-control form-control-sm"
                            min="0" placeholder="0">
                 </div>
             </div>
             <div class="modal-footer py-2">
-                <button class="btn btn-secondary btn-sm" data-dismiss="modal">Batal</button>
+                <button class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
                 <button class="btn btn-primary btn-sm" onclick="saveShift()">
-                    <i class="fas fa-save mr-1"></i>Simpan
+                    <i class="fas fa-save mr-1"></i>Save
                 </button>
             </div>
         </div>
@@ -292,7 +331,7 @@ tr.s4 td:first-child { border-left:3px solid #e74a3b; }
 </div>
 
 <!-- ════════════════════════════════════════════════════════════ -->
-<!--  MODAL: Jam Istirahat -->
+<!--  MODAL: Break Hours -->
 <!-- ════════════════════════════════════════════════════════════ -->
 <div class="modal fade" id="modalBreak" tabindex="-1">
     <div class="modal-dialog modal-sm">
@@ -300,38 +339,38 @@ tr.s4 td:first-child { border-left:3px solid #e74a3b; }
             <div class="modal-header py-2">
                 <h6 class="modal-title font-weight-bold">
                     <i class="fas fa-coffee text-warning mr-1"></i>
-                    Jam Istirahat — <span id="mBreakShiftName"></span>
+                    Break Hours — <span id="mBreakShiftName"></span>
                 </h6>
                 <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
             </div>
             <div class="modal-body p-2">
                 <input type="hidden" id="mBreakShiftNo">
-                <!-- List istirahat -->
+                <!-- Break list -->
                 <div id="breakList" class="mb-2"></div>
-                <!-- Form tambah / edit -->
+                <!-- Add / edit form -->
                 <div id="breakForm" class="border rounded p-2" style="background:#fffbf0;">
                     <input type="hidden" id="mBreakId">
                     <div class="form-group mb-1">
-                        <label class="small font-weight-bold mb-0">Nama Istirahat</label>
+                        <label class="small font-weight-bold mb-0">Break Name</label>
                         <input type="text" id="mBreakName" class="form-control form-control-sm"
-                               placeholder="Istirahat Makan Siang">
+                               placeholder="Lunch Break">
                     </div>
                     <div class="form-row mb-1">
                         <div class="col">
-                            <label class="small font-weight-bold mb-0">Mulai</label>
+                            <label class="small font-weight-bold mb-0">Start</label>
                             <input type="time" id="mBreakStart" class="form-control form-control-sm">
                         </div>
                         <div class="col">
-                            <label class="small font-weight-bold mb-0">Selesai</label>
+                            <label class="small font-weight-bold mb-0">End</label>
                             <input type="time" id="mBreakEnd" class="form-control form-control-sm">
                         </div>
                     </div>
                     <div class="d-flex" style="gap:4px;">
                         <button class="btn btn-warning btn-sm flex-fill" onclick="saveBreak()">
-                            <i class="fas fa-save mr-1"></i>Simpan Istirahat
+                            <i class="fas fa-save mr-1"></i>Save Break
                         </button>
                         <button class="btn btn-light btn-sm" onclick="clearBreakForm()">
-                            Batal
+                            Cancel
                         </button>
                     </div>
                 </div>
@@ -339,9 +378,9 @@ tr.s4 td:first-child { border-left:3px solid #e74a3b; }
             <div class="modal-footer py-2 d-flex justify-content-between align-items-center">
                 <small class="text-muted">
                     <i class="fas fa-info-circle mr-1"></i>
-                    Istirahat dikecualikan dari kalkulasi Availability
+                    Breaks are excluded from the Availability calculation
                 </small>
-                <button class="btn btn-secondary btn-sm" data-dismiss="modal">Tutup</button>
+                <button class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -355,13 +394,116 @@ var SCOLORS = ['','#4e73df','#1cc88a','#f6c23e','#e74a3b'];
 var _auditLog = [];
 var _donutChart = {};
 
+// ── Auto/Manual mode ────────────────────────────────────────
+var inputMode = 'auto';          // 'auto' | 'manual'
+var _esp32Timer = null;          // setInterval handle
+
+function setProdMode(mode) {
+    inputMode = mode;
+    if (mode === 'auto') {
+        $('#btnModeAuto').removeClass('btn-outline-primary').addClass('btn-primary active');
+        $('#btnModeManual').removeClass('btn-secondary active').addClass('btn-outline-secondary');
+        $('#btnFetchEsp32').show();
+        $('#esp32SyncBar').show();
+        $('#manualWarning').hide();
+        // Start auto-fetch interval
+        if (_esp32Timer) clearInterval(_esp32Timer);
+        _esp32Timer = setInterval(fetchEsp32All, 30000);
+        fetchEsp32All();
+    } else {
+        $('#btnModeManual').removeClass('btn-outline-secondary').addClass('btn-secondary active');
+        $('#btnModeAuto').removeClass('btn-primary active').addClass('btn-outline-primary');
+        $('#btnFetchEsp32').hide();
+        $('#esp32SyncBar').hide();
+        $('#manualWarning').show();
+        // Stop auto-fetch
+        if (_esp32Timer) { clearInterval(_esp32Timer); _esp32Timer = null; }
+        // Re-render prod table in manual (editable) mode
+        renderProdTable();
+    }
+}
+
+function fetchEsp32All() {
+    if (inputMode !== 'auto') return;
+    if (!_shifts.length) return;
+    var pending = _shifts.length;
+    _shifts.forEach(function(r) {
+        var sno = r.shift_no;
+        $.get('api/shift_production.php', {
+            action: 'esp32_latest',
+            machine_id: MID,
+            shift_no: sno
+        }, function(d) {
+            applyEsp32Row(sno, d);
+        }).fail(function() {
+            applyEsp32Row(sno, null);
+        }).always(function() {
+            pending--;
+            if (pending === 0) {
+                var ts = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+                $('#esp32SyncBar').html('<i class="fas fa-clock mr-1"></i>Last synced: ' + ts);
+                renderOEE(); // only refresh OEE cards, no full reload
+            }
+        });
+    });
+}
+
+function applyEsp32Row(sno, d) {
+    // d may be null (fetch error), or a JSON object
+    var out = 0, rej = 0, ok = false;
+    if (d && d.success && d.data) {
+        out = parseInt(d.data.total_out)    || 0;
+        rej = parseInt(d.data.total_reject) || 0;
+        ok  = true;
+    }
+    var outEl = $('#bodyProd .prod-out[data-sno="' + sno + '"]');
+    var rejEl = $('#bodyProd .prod-rej[data-sno="' + sno + '"]');
+    if (!outEl.length) return;
+
+    if (!ok) {
+        outEl.text('—').attr('contenteditable','false')
+             .addClass('prod-auto-cell').attr('title','No sensor data available');
+        rejEl.text('—').attr('contenteditable','false')
+             .addClass('prod-auto-cell').attr('title','No sensor data available');
+        return;
+    }
+    // Style as auto cells
+    outEl.html('<i class="fas fa-robot"></i>' + out)
+         .attr('contenteditable','false')
+         .addClass('prod-auto-cell').removeClass('editable')
+         .attr('title','Value from ESP32 sensor');
+    rejEl.html('<i class="fas fa-robot"></i>' + rej)
+         .attr('contenteditable','false')
+         .addClass('prod-auto-cell').removeClass('editable')
+         .attr('title','Value from ESP32 sensor');
+    // Auto-save to DB silently
+    apiPost('api/shift_config.php', {
+        action:'save_production', machine_id:MID, date:DATE, shift_no:sno,
+        total_out:out, total_reject:rej
+    }, function(d2) {
+        if (d2.success) addLog('[ESP32] S' + sno + ': out=' + out + ' rej=' + rej);
+    });
+}
+
 $(document).ready(function(){
     $('#selMachine, #selDate').on('change', function(){
         MID  = parseInt($('#selMachine').val())||0;
         DATE = $('#selDate').val();
+        // Reset auto-fetch timer on machine/date change
+        if (_esp32Timer) { clearInterval(_esp32Timer); _esp32Timer = null; }
         loadAll();
+        if (inputMode === 'auto') {
+            _esp32Timer = setInterval(fetchEsp32All, 30000);
+        }
     });
     loadAll();
+    // Start auto-fetch interval on page load (default auto mode)
+    // Delay slightly so loadAll/loadDaySummary finishes first
+    if (inputMode === 'auto') {
+        setTimeout(function(){
+            _esp32Timer = setInterval(fetchEsp32All, 30000);
+        }, 1500);
+    }
 });
 
 function loadAll() {
@@ -376,22 +518,22 @@ function loadShiftConfig() {
         if (!d.success) return;
         var tb = $('#bodyShift').empty();
         if (!d.data.length) {
-            tb.append('<tr><td colspan="6" class="text-center text-muted py-2">Belum ada shift</td></tr>');
+            tb.append('<tr><td colspan="6" class="text-center text-muted py-2">No shifts configured</td></tr>');
             return;
         }
         d.data.forEach(function(r) {
-            // Durasi netto = shift - break
+            // Net duration = shift - break
             var netMin  = parseFloat(r.net_minutes)||0;
             var brkMin  = parseInt(r.break_minutes)||0;
-            var netStr  = Math.floor(netMin/60)+'j '+Math.round(netMin%60)+'m';
-            var netHtml = '<span title="'+Math.floor((parseFloat(r.duration_min)||0)/60)+'j '
-                         +Math.round((parseFloat(r.duration_min)||0)%60)+'m kotor">'+netStr+'</span>';
-            if (brkMin>0) netHtml += ' <span class="text-warning" style="font-size:.65rem;" title="istirahat '+brkMin+' mnt dikecualikan">(-'+brkMin+'m)</span>';
+            var netStr  = Math.floor(netMin/60)+'h '+Math.round(netMin%60)+'m';
+            var netHtml = '<span title="'+Math.floor((parseFloat(r.duration_min)||0)/60)+'h '
+                         +Math.round((parseFloat(r.duration_min)||0)%60)+'m gross">'+netStr+'</span>';
+            if (brkMin>0) netHtml += ' <span class="text-warning" style="font-size:.65rem;" title="break '+brkMin+' min excluded">(-'+brkMin+'m)</span>';
 
             var row = $('<tr>').addClass('s'+r.shift_no)
                 .append($('<td>').html(
                     '<button class="btn btn-xs '+(r.is_active?'btn-success':'btn-secondary')+
-                    ' px-1 py-0" onclick="toggleShift('+r.id+')" title="Aktif/Nonaktif" '+
+                    ' px-1 py-0" onclick="toggleShift('+r.id+')" title="Active/Inactive" '+
                     'style="font-size:.65rem;line-height:1.2;">'+
                     (r.is_active?'<i class="fas fa-check"></i>':'<i class="fas fa-times"></i>')+
                     '</button>'
@@ -403,7 +545,7 @@ function loadShiftConfig() {
                     '>'+escH(r.shift_name)+'</span>'+
                     ' <button class="btn btn-xs btn-outline-warning btn-add-break px-1" '+
                     'onclick="openBreakModal('+r.shift_no+',\''+escH(r.shift_name)+'\')" '+
-                    'title="Kelola jam istirahat"><i class="fas fa-coffee"></i></button>'
+                    'title="Manage break hours"><i class="fas fa-coffee"></i></button>'
                 ))
                 .append($('<td>').html(
                     '<span class="editable" contenteditable="true" data-id="'+r.id+'" data-field="start_time"'+
@@ -442,7 +584,7 @@ function bindInlineShift() {
         };
         if (fld==='shift_name') payload.shift_name = val;
         apiPost('api/shift_config.php', payload, function(d) {
-            if (d.success) { flash(el); addLog('Jam kerja diperbarui: '+val); loadDaySummary(); }
+            if (d.success) { flash(el); addLog('Working hours updated: '+val); loadDaySummary(); }
             else { alert(d.error); loadShiftConfig(); }
         });
     });
@@ -454,15 +596,15 @@ function toggleShift(id) {
     });
 }
 function deleteShift(id, name, mid) {
-    if (!confirm('Hapus shift "'+name+'"? Data produksi yang sudah ada tidak akan hilang.')) return;
+    if (!confirm('Delete shift "'+name+'"? Existing production data will not be lost.')) return;
     apiPost('api/shift_config.php', {action:'delete', id:id, machine_id:mid}, function(d) {
-        if (d.success) { loadShiftConfig(); loadDaySummary(); addLog('Shift "'+name+'" dihapus'); }
+        if (d.success) { loadShiftConfig(); loadDaySummary(); addLog('Shift "'+name+'" deleted'); }
     });
 }
 function openAddShift() {
     $('#mShiftId').val(''); $('#mShiftNo').val(''); $('#mShiftName').val('');
     $('#mStart').val(''); $('#mEnd').val(''); $('#mPlan').val('');
-    $('#modalShiftTitle').text('Tambah Shift');
+    $('#modalShiftTitle').text('Add Shift');
     $('#modalShift').modal('show');
 }
 function saveShift() {
@@ -474,12 +616,12 @@ function saveShift() {
         plan_qty:parseInt($('#mPlan').val())||0
     };
     apiPost('api/shift_config.php', payload, function(d) {
-        if (d.success) { $('#modalShift').modal('hide'); loadShiftConfig(); loadDaySummary(); addLog('Shift disimpan'); }
+        if (d.success) { $('#modalShift').modal('hide'); loadShiftConfig(); loadDaySummary(); addLog('Shift saved'); }
         else alert(d.error);
     });
 }
 
-// ── Istirahat modal ──────────────────────────────────────────
+// ── Break modal ──────────────────────────────────────────────
 function openBreakModal(sno, sname) {
     $('#mBreakShiftNo').val(sno);
     $('#mBreakShiftName').text(sname);
@@ -493,7 +635,7 @@ function loadBreakList(sno) {
     $.get('api/shift_config.php', {action:'breaks', machine_id:MID, shift_no:sno}, function(d) {
         var c = $('#breakList').empty();
         if (!d.success || !d.data.length) {
-            c.html('<p class="text-muted mb-1" style="font-size:.75rem;">Belum ada jam istirahat.</p>');
+            c.html('<p class="text-muted mb-1" style="font-size:.75rem;">No break hours configured.</p>');
             return;
         }
         d.data.forEach(function(b) {
@@ -503,17 +645,17 @@ function loadBreakList(sno) {
             row.append($('<div class="flex-fill" style="font-size:.78rem;">').html(
                 '<strong>'+escH(b.break_name)+'</strong> '+
                 '<span class="text-muted">'+b.start_time.substr(0,5)+'–'+b.end_time.substr(0,5)+
-                ' ('+dur+' mnt)</span>'
+                ' ('+dur+' min)</span>'
             ));
             row.append($('<div class="d-flex" style="gap:3px;">').html(
                 '<button class="btn btn-xs btn-outline-primary px-1 py-0" title="Edit" '+
                 'onclick="editBreak('+b.id+',\''+escH(b.break_name)+'\',\''+b.start_time.substr(0,5)+'\',\''+b.end_time.substr(0,5)+'\')">'+
                 '<i class="fas fa-edit"></i></button>'+
                 '<button class="btn btn-xs '+(b.is_active?'btn-warning':'btn-secondary')+' px-1 py-0" '+
-                'onclick="toggleBreak('+b.id+')" title="'+(b.is_active?'Nonaktifkan':'Aktifkan')+'">'+
+                'onclick="toggleBreak('+b.id+')" title="'+(b.is_active?'Deactivate':'Activate')+'">'+
                 '<i class="fas fa-'+(b.is_active?'pause':'play')+'"></i></button>'+
                 '<button class="btn btn-xs btn-outline-danger px-1 py-0" '+
-                'onclick="deleteBreak('+b.id+')" title="Hapus">'+
+                'onclick="deleteBreak('+b.id+')" title="Delete">'+
                 '<i class="fas fa-trash"></i></button>'
             ));
             c.append(row);
@@ -537,10 +679,10 @@ function clearBreakForm() {
 
 function saveBreak() {
     var sno   = parseInt($('#mBreakShiftNo').val())||0;
-    var name  = $('#mBreakName').val().trim() || 'Istirahat';
+    var name  = $('#mBreakName').val().trim() || 'Break';
     var start = $('#mBreakStart').val();
     var end   = $('#mBreakEnd').val();
-    if (!start||!end) { alert('Isi jam mulai dan selesai.'); return; }
+    if (!start||!end) { alert('Please fill in the start and end time.'); return; }
     apiPost('api/shift_config.php', {
         action:'save_break', id:parseInt($('#mBreakId').val())||0,
         machine_id:MID, shift_no:sno, break_name:name, start_time:start, end_time:end
@@ -550,7 +692,7 @@ function saveBreak() {
             loadBreakList(sno);
             loadShiftConfig();
             loadDaySummary();
-            addLog('Istirahat disimpan: '+name+' '+start+'–'+end);
+            addLog('Break saved: '+name+' '+start+'–'+end);
         } else alert(d.error);
     });
 }
@@ -562,13 +704,13 @@ function toggleBreak(id) {
 }
 
 function deleteBreak(id) {
-    if (!confirm('Hapus jam istirahat ini?')) return;
+    if (!confirm('Delete this break?')) return;
     apiPost('api/shift_config.php', {action:'delete_break', id:id, machine_id:MID}, function(d) {
-        if (d.success) { loadBreakList(parseInt($('#mBreakShiftNo').val())); loadShiftConfig(); loadDaySummary(); addLog('Istirahat dihapus'); }
+        if (d.success) { loadBreakList(parseInt($('#mBreakShiftNo').val())); loadShiftConfig(); loadDaySummary(); addLog('Break deleted'); }
     });
 }
 
-// ── 2 & 3. Day summary → Plan + Produksi + OEE ──────────────
+// ── 2 & 3. Day summary → Plan + Production + OEE ─────────────
 function loadDaySummary() {
     if (!MID) return;
     $.get('api/shift_config.php', {action:'day_summary', machine_id:MID, date:DATE}, function(d) {
@@ -578,6 +720,8 @@ function loadDaySummary() {
         renderProdTable();
         renderOEE();
         renderNoteShiftSelect();
+        // Auto mode: fetch ESP32 data only on initial load, not on every re-render
+        if (inputMode === 'auto' && !_esp32Timer) fetchEsp32All();
     });
 }
 
@@ -614,50 +758,68 @@ function renderPlanTable() {
 function renderProdTable() {
     var tb = $('#bodyProd').empty();
     if (!_shifts.length) { tb.append('<tr><td colspan="5" class="text-center text-muted py-2">—</td></tr>'); return; }
+    var isAuto = (inputMode === 'auto');
     _shifts.forEach(function(r) {
         var out  = parseInt(r.total_out)    || 0;
         var rej  = parseInt(r.total_reject) || 0;
         var good = Math.max(0, out - rej);
         var qual = out > 0 ? Math.round(good/out*100) : 0;
         var qc   = qual>=98?'success':qual>=90?'warning':'danger';
+
+        // Auto mode: read-only cells with robot icon + blue bg
+        // Manual mode: editable cells (original behavior)
+        var outHtml, rejHtml;
+        if (isAuto) {
+            outHtml = '<span class="prod-out prod-auto-cell" contenteditable="false"'+
+                      ' data-sno="'+r.shift_no+'" style="font-weight:700;"'+
+                      ' title="Value from ESP32 sensor">'+
+                      '<i class="fas fa-robot"></i>'+out+'</span>';
+            rejHtml = '<span class="prod-rej prod-auto-cell" contenteditable="false"'+
+                      ' data-sno="'+r.shift_no+'" style="color:#1a5276;font-weight:700;"'+
+                      ' title="Value from ESP32 sensor">'+
+                      '<i class="fas fa-robot"></i>'+rej+'</span>';
+        } else {
+            outHtml = '<span class="editable prod-out" contenteditable="true"'+
+                      ' data-sno="'+r.shift_no+'" style="font-weight:700;">'+out+'</span>';
+            rejHtml = '<span class="editable prod-rej" contenteditable="true"'+
+                      ' data-sno="'+r.shift_no+'" style="color:#e74a3b;font-weight:700;">'+rej+'</span>';
+        }
+
         tb.append($('<tr>').addClass('s'+r.shift_no)
             .append($('<td>').html(shiftBadge(r)))
-            .append($('<td>').html(
-                '<span class="editable prod-out" contenteditable="true"'+
-                ' data-sno="'+r.shift_no+'" style="font-weight:700;">'+out+'</span>'
-            ))
-            .append($('<td>').html(
-                '<span class="editable prod-rej" contenteditable="true"'+
-                ' data-sno="'+r.shift_no+'" style="color:#e74a3b;font-weight:700;">'+rej+'</span>'
-            ))
+            .append($('<td>').html(outHtml))
+            .append($('<td>').html(rejHtml))
             .append($('<td class="text-success font-weight-bold">').text(good))
             .append($('<td>').html('<span class="badge badge-'+qc+'">'+qual+'%</span>'))
         );
     });
-    // Bind out/reject edit
-    function bindProd(sel, field) {
-        $(sel).off('blur keydown').on('keydown', function(e) {
-            if (e.key==='Enter') { e.preventDefault(); $(this).blur(); }
-        }).on('blur', function() {
-            var sno = $(this).data('sno');
-            var outEl = $('#bodyProd .prod-out[data-sno="'+sno+'"]');
-            var rejEl = $('#bodyProd .prod-rej[data-sno="'+sno+'"]');
-            var out = parseInt(outEl.text())||0;
-            var rej = parseInt(rejEl.text())||0;
-            apiPost('api/shift_config.php', {
-                action:'save_production', machine_id:MID, date:DATE, shift_no:sno,
-                total_out:out, total_reject:rej
-            }, function(d) {
-                if (d.success) {
-                    flash($(this));
-                    addLog('Produksi S'+sno+': out='+out+' rej='+rej+' qual='+d.quality+'%');
-                    loadDaySummary();
-                }
-            }.bind(this));
-        });
+
+    // Only bind edit handlers in manual mode
+    if (!isAuto) {
+        function bindProd(sel) {
+            $(sel).off('blur keydown').on('keydown', function(e) {
+                if (e.key==='Enter') { e.preventDefault(); $(this).blur(); }
+            }).on('blur', function() {
+                var sno = $(this).data('sno');
+                var outEl = $('#bodyProd .prod-out[data-sno="'+sno+'"]');
+                var rejEl = $('#bodyProd .prod-rej[data-sno="'+sno+'"]');
+                var out = parseInt(outEl.text())||0;
+                var rej = parseInt(rejEl.text())||0;
+                apiPost('api/shift_config.php', {
+                    action:'save_production', machine_id:MID, date:DATE, shift_no:sno,
+                    total_out:out, total_reject:rej
+                }, function(d) {
+                    if (d.success) {
+                        flash($(this));
+                        addLog('Production S'+sno+': out='+out+' rej='+rej+' qual='+d.quality+'%');
+                        loadDaySummary();
+                    }
+                }.bind(this));
+            });
+        }
+        bindProd('#bodyProd .prod-out');
+        bindProd('#bodyProd .prod-rej');
     }
-    bindProd('#bodyProd .prod-out', 'out');
-    bindProd('#bodyProd .prod-rej', 'rej');
 }
 
 // ── OEE Summary Cards ────────────────────────────────────────
@@ -693,7 +855,7 @@ function renderOEE() {
         );
         row.append(card);
 
-        // Draw donuts setelah DOM ready
+        // Draw donuts after DOM ready
         setTimeout(function() {
             drawDonut('oee-a-'+i, avail, '#4e73df');
             drawDonut('oee-p-'+i, perf,  '#1cc88a');
@@ -731,13 +893,13 @@ function drawDonut(id, val, clr) {
 
 function oeeStatusBadge(v) {
     var c = v>=85?'success':v>=60?'warning':v>0?'danger':'secondary';
-    var l = v>=85?'Baik':v>=60?'Cukup':v>0?'Rendah':'N/A';
+    var l = v>=85?'Good':v>=60?'Fair':v>0?'Low':'N/A';
     return '<span class="badge badge-'+c+'" style="font-size:.78rem;">'+l+'</span>';
 }
 
-// ── Operator + Catatan ───────────────────────────────────────
+// ── Operator + Notes ────────────────────────────────────────
 function renderNoteShiftSelect() {
-    var sel = $('#noteShift').empty().append('<option value="">Pilih shift…</option>');
+    var sel = $('#noteShift').empty().append('<option value="">Select shift…</option>');
     _shifts.forEach(function(r) {
         sel.append('<option value="'+r.shift_no+'">S'+r.shift_no+' '+escH(r.shift_name)+'</option>');
     });
@@ -745,10 +907,10 @@ function renderNoteShiftSelect() {
 
 function saveNotes() {
     var sno = parseInt($('#noteShift').val())||0;
-    if (!sno) { alert('Pilih shift terlebih dahulu.'); return; }
+    if (!sno) { alert('Please select a shift first.'); return; }
     var op  = $('#noteOperator').val().trim();
     var txt = $('#noteText').val().trim();
-    // Ambil data produksi saat ini
+    // Get current production data
     var row = _shifts.find(function(r){ return r.shift_no===sno; }) || {};
     apiPost('api/shift_config.php', {
         action:'save_production', machine_id:MID, date:DATE, shift_no:sno,
@@ -757,9 +919,9 @@ function saveNotes() {
         operator_name:op, notes:txt
     }, function(d) {
         if (d.success) {
-            $('#noteStatus').text('Tersimpan ✓').addClass('text-success');
+            $('#noteStatus').text('Saved ✓').addClass('text-success');
             setTimeout(function(){ $('#noteStatus').text(''); }, 2000);
-            addLog('Catatan S'+sno+' disimpan'+(op?' oleh '+op:''));
+            addLog('Notes S'+sno+' saved'+(op?' by '+op:''));
         }
     });
 }
@@ -777,7 +939,7 @@ function flash(el) {
 }
 
 function addLog(msg) {
-    var t = new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    var t = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
     _auditLog.unshift('<span class="text-muted">'+t+'</span> '+escH(msg));
     if (_auditLog.length > 20) _auditLog.pop();
     $('#auditLog').html(_auditLog.join('<br>'));
@@ -791,7 +953,7 @@ function apiPost(url, data, cb) {
     $.ajax({ url:url, method:'POST', contentType:'application/json',
              data:JSON.stringify(data), dataType:'json',
              success:cb,
-             error:function(){ alert('Gagal terhubung ke server.'); }
+             error:function(){ alert('Failed to connect to the server.'); }
     });
 }
 </script>

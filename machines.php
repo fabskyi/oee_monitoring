@@ -1,7 +1,7 @@
 <?php
 require_once 'includes/auth_check.php';
 $currentPage = 'machines';
-$pageTitle   = 'Status Mesin';
+$pageTitle   = 'Machine Status';
 
 $db = getDB();
 
@@ -86,10 +86,10 @@ include 'includes/header.php';
 
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-cogs mr-2"></i>Status Mesin</h1>
+    <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-cogs mr-2"></i>Machine Status</h1>
     <?php if ($canEdit): ?>
         <button class="btn btn-primary btn-sm shadow-sm" data-toggle="modal" data-target="#addMachineModal">
-            <i class="fas fa-plus fa-sm text-white-50 mr-1"></i> Tambah Mesin
+            <i class="fas fa-plus fa-sm text-white-50 mr-1"></i> Add Machine
         </button>
     <?php endif; ?>
 </div>
@@ -100,9 +100,9 @@ include 'includes/header.php';
         <form method="GET" action="machines.php" class="form-inline flex-wrap" id="filterForm">
             <!-- Line filter -->
             <div class="form-group mr-3 mb-2">
-                <label class="mr-2 text-gray-600 small font-weight-bold">Lini:</label>
+                <label class="mr-2 text-gray-600 small font-weight-bold">Line:</label>
                 <select name="line_id" class="form-control form-control-sm" id="filterLine">
-                    <option value="0">Semua Lini</option>
+                    <option value="0">All Lines</option>
                     <?php foreach ($allLines as $ln): ?>
                         <option value="<?= $ln['id'] ?>"
                             <?= ($filterLine == $ln['id']) ? 'selected' : '' ?>>
@@ -115,15 +115,15 @@ include 'includes/header.php';
             <div class="form-group mr-3 mb-2">
                 <label class="mr-2 text-gray-600 small font-weight-bold">Status:</label>
                 <select name="status" class="form-control form-control-sm" id="filterStatus">
-                    <option value="all"  <?= $filterStatus === 'all'  ? 'selected' : '' ?>>Semua</option>
+                    <option value="all"  <?= $filterStatus === 'all'  ? 'selected' : '' ?>>All</option>
                     <option value="run"  <?= $filterStatus === 'run'  ? 'selected' : '' ?>>Run</option>
                     <option value="stop" <?= $filterStatus === 'stop' ? 'selected' : '' ?>>Stop</option>
                 </select>
             </div>
             <!-- Search -->
             <div class="form-group mr-3 mb-2">
-                <label class="mr-2 text-gray-600 small font-weight-bold">Cari:</label>
-                <input type="text" name="search" class="form-control form-control-sm" placeholder="Nama / Model..."
+                <label class="mr-2 text-gray-600 small font-weight-bold">Search:</label>
+                <input type="text" name="search" class="form-control form-control-sm" placeholder="Name / Model..."
                     value="<?= htmlspecialchars($filterSearch) ?>" id="filterSearch" style="min-width:180px;">
             </div>
             <div class="mb-2">
@@ -142,7 +142,7 @@ include 'includes/header.php';
 <?php if (empty($machines)): ?>
     <div class="text-center py-5 text-gray-500">
         <i class="fas fa-cogs fa-3x mb-3"></i>
-        <p class="h5">Tidak ada mesin ditemukan.</p>
+        <p class="h5">No machines found.</p>
     </div>
 <?php else: ?>
 <div class="row" id="machinesGrid">
@@ -200,7 +200,7 @@ include 'includes/header.php';
                             <button class="dropdown-item text-danger btn-delete-machine"
                                 data-id="<?= $m['id'] ?>"
                                 data-name="<?= htmlspecialchars($m['name']) ?>">
-                                <i class="fas fa-trash fa-sm fa-fw mr-2"></i>Hapus
+                                <i class="fas fa-trash fa-sm fa-fw mr-2"></i>Delete
                             </button>
                         </div>
                     </div>
@@ -221,7 +221,7 @@ include 'includes/header.php';
                         <span class="font-weight-bold text-gray-800 small"><?= htmlspecialchars($m['model'] ?: '-') ?></span>
                     </div>
                     <div class="col-6">
-                        <small class="text-muted d-block">Lini Produksi</small>
+                        <small class="text-muted d-block">Production Line</small>
                         <span class="font-weight-bold text-gray-800 small"><?= htmlspecialchars($m['line_name'] ?: '-') ?></span>
                     </div>
                 </div>
@@ -290,7 +290,7 @@ include 'includes/header.php';
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="addMachineModalLabel"><i class="fas fa-plus-circle mr-2"></i>Tambah Mesin</h5>
+                <h5 class="modal-title" id="addMachineModalLabel"><i class="fas fa-plus-circle mr-2"></i>Add Machine</h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -298,17 +298,17 @@ include 'includes/header.php';
             <div class="modal-body">
                 <form id="addMachineForm">
                     <div class="form-group">
-                        <label>Nama Mesin <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" name="name" id="add_name" required placeholder="Contoh: Mesin Bubut A">
+                        <label>Machine Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" name="name" id="add_name" required placeholder="e.g. Lathe Machine A">
                     </div>
                     <div class="form-group">
                         <label>Model</label>
-                        <input type="text" class="form-control" name="model" id="add_model" placeholder="Contoh: CNC-1000">
+                        <input type="text" class="form-control" name="model" id="add_model" placeholder="e.g. CNC-1000">
                     </div>
                     <div class="form-group">
-                        <label>Lini Produksi <span class="text-danger">*</span></label>
+                        <label>Production Line <span class="text-danger">*</span></label>
                         <select class="form-control" name="line_id" id="add_line_id" required>
-                            <option value="">-- Pilih Lini --</option>
+                            <option value="">-- Select Line --</option>
                             <?php foreach ($allLines as $ln): ?>
                                 <option value="<?= $ln['id'] ?>"><?= htmlspecialchars($ln['name']) ?></option>
                             <?php endforeach; ?>
@@ -322,15 +322,15 @@ include 'includes/header.php';
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Urutan Tampil</label>
+                        <label>Display Order</label>
                         <input type="number" class="form-control" name="sort_order" id="add_sort_order" value="0" min="0">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="btnAddMachineSave">
-                    <i class="fas fa-save mr-1"></i>Simpan
+                    <i class="fas fa-save mr-1"></i>Save
                 </button>
             </div>
         </div>
@@ -344,7 +344,7 @@ include 'includes/header.php';
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header bg-warning text-white">
-                <h5 class="modal-title" id="editMachineModalLabel"><i class="fas fa-edit mr-2"></i>Edit Mesin</h5>
+                <h5 class="modal-title" id="editMachineModalLabel"><i class="fas fa-edit mr-2"></i>Edit Machine</h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -352,12 +352,12 @@ include 'includes/header.php';
             <div class="modal-body">
                 <div id="editLoadingSpinner" class="text-center py-4" style="display:none;">
                     <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
-                    <p class="mt-2 text-muted">Memuat data...</p>
+                    <p class="mt-2 text-muted">Loading data...</p>
                 </div>
                 <form id="editMachineForm">
                     <input type="hidden" name="id" id="edit_id">
                     <div class="form-group">
-                        <label>Nama Mesin <span class="text-danger">*</span></label>
+                        <label>Machine Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" name="name" id="edit_name" required>
                     </div>
                     <div class="form-group">
@@ -365,9 +365,9 @@ include 'includes/header.php';
                         <input type="text" class="form-control" name="model" id="edit_model">
                     </div>
                     <div class="form-group">
-                        <label>Lini Produksi <span class="text-danger">*</span></label>
+                        <label>Production Line <span class="text-danger">*</span></label>
                         <select class="form-control" name="line_id" id="edit_line_id" required>
-                            <option value="">-- Pilih Lini --</option>
+                            <option value="">-- Select Line --</option>
                             <?php foreach ($allLines as $ln): ?>
                                 <option value="<?= $ln['id'] ?>"><?= htmlspecialchars($ln['name']) ?></option>
                             <?php endforeach; ?>
@@ -381,13 +381,13 @@ include 'includes/header.php';
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Urutan Tampil</label>
+                        <label>Display Order</label>
                         <input type="number" class="form-control" name="sort_order" id="edit_sort_order" value="0" min="0">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-warning text-white" id="btnEditMachineSave">
                     <i class="fas fa-save mr-1"></i>Update
                 </button>
@@ -403,20 +403,20 @@ include 'includes/header.php';
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="deleteMachineModalLabel"><i class="fas fa-trash mr-2"></i>Hapus Mesin</h5>
+                <h5 class="modal-title" id="deleteMachineModalLabel"><i class="fas fa-trash mr-2"></i>Delete Machine</h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <p>Hapus mesin <strong id="deleteMachineName"></strong>?</p>
-                <p class="text-danger small">Tindakan ini tidak dapat dibatalkan.</p>
+                <p>Delete machine <strong id="deleteMachineName"></strong>?</p>
+                <p class="text-danger small">This action cannot be undone.</p>
                 <input type="hidden" id="deleteMachineId">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-danger btn-sm" id="btnDeleteMachineConfirm">
-                    <i class="fas fa-trash mr-1"></i>Hapus
+                    <i class="fas fa-trash mr-1"></i>Delete
                 </button>
             </div>
         </div>
@@ -468,7 +468,7 @@ $(document).ready(function () {
 
     // ─── ADD MACHINE ─────────────────────────────────────────────────────────
     $('#btnAddMachineSave').on('click', function () {
-        var btn = $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Menyimpan...');
+        var btn = $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Saving...');
         var formData = $('#addMachineForm').serialize();
         $.ajax({
             url: 'api/machines.php?action=create',
@@ -477,19 +477,19 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (res) {
                 if (res.success) {
-                    showToast('Mesin berhasil ditambahkan!', 'success');
+                    showToast('Machine added successfully!', 'success');
                     $('#addMachineModal').modal('hide');
                     setTimeout(function () { location.reload(); }, 800);
                 } else {
-                    showToast('Gagal: ' + (res.message || 'Kesalahan tidak diketahui'), 'error');
-                    $('#btnAddMachineSave').prop('disabled', false).html('<i class="fas fa-save mr-1"></i>Simpan');
+                    showToast('Failed: ' + (res.message || 'Unknown error'), 'error');
+                    $('#btnAddMachineSave').prop('disabled', false).html('<i class="fas fa-save mr-1"></i>Save');
                 }
             },
             error: function (xhr) {
-                var msg = 'Terjadi kesalahan server.';
+                var msg = 'A server error occurred.';
                 try { msg = JSON.parse(xhr.responseText).message || msg; } catch(e) {}
                 showToast(msg, 'error');
-                $('#btnAddMachineSave').prop('disabled', false).html('<i class="fas fa-save mr-1"></i>Simpan');
+                $('#btnAddMachineSave').prop('disabled', false).html('<i class="fas fa-save mr-1"></i>Save');
             }
         });
     });
@@ -497,7 +497,7 @@ $(document).ready(function () {
     // Reset add form when modal closes
     $('#addMachineModal').on('hidden.bs.modal', function () {
         $('#addMachineForm')[0].reset();
-        $('#btnAddMachineSave').prop('disabled', false).html('<i class="fas fa-save mr-1"></i>Simpan');
+        $('#btnAddMachineSave').prop('disabled', false).html('<i class="fas fa-save mr-1"></i>Save');
     });
 
     // ─── OPEN EDIT MODAL ─────────────────────────────────────────────────────
@@ -520,18 +520,18 @@ $(document).ready(function () {
                 $('#editMachineForm').show();
                 $('#btnEditMachineSave').prop('disabled', false).html('<i class="fas fa-save mr-1"></i>Update');
             } else {
-                showToast('Gagal memuat data mesin.', 'error');
+                showToast('Failed to load machine data.', 'error');
                 $('#editMachineModal').modal('hide');
             }
         }, 'json').fail(function () {
-            showToast('Gagal memuat data mesin.', 'error');
+            showToast('Failed to load machine data.', 'error');
             $('#editMachineModal').modal('hide');
         });
     });
 
     // ─── SAVE EDIT ───────────────────────────────────────────────────────────
     $('#btnEditMachineSave').on('click', function () {
-        $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Menyimpan...');
+        $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Saving...');
         var formData = $('#editMachineForm').serialize();
         $.ajax({
             url: 'api/machines.php?action=update',
@@ -540,16 +540,16 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (res) {
                 if (res.success) {
-                    showToast('Mesin berhasil diupdate!', 'success');
+                    showToast('Machine updated successfully!', 'success');
                     $('#editMachineModal').modal('hide');
                     setTimeout(function () { location.reload(); }, 800);
                 } else {
-                    showToast('Gagal: ' + (res.message || 'Kesalahan tidak diketahui'), 'error');
+                    showToast('Failed: ' + (res.message || 'Unknown error'), 'error');
                     $('#btnEditMachineSave').prop('disabled', false).html('<i class="fas fa-save mr-1"></i>Update');
                 }
             },
             error: function (xhr) {
-                var msg = 'Terjadi kesalahan server.';
+                var msg = 'A server error occurred.';
                 try { msg = JSON.parse(xhr.responseText).message || msg; } catch(e) {}
                 showToast(msg, 'error');
                 $('#btnEditMachineSave').prop('disabled', false).html('<i class="fas fa-save mr-1"></i>Update');
@@ -569,7 +569,7 @@ $(document).ready(function () {
     // ─── CONFIRM DELETE ──────────────────────────────────────────────────────
     $('#btnDeleteMachineConfirm').on('click', function () {
         var id = $('#deleteMachineId').val();
-        $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Menghapus...');
+        $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i>Deleting...');
         $.ajax({
             url: 'api/machines.php?action=delete',
             method: 'POST',
@@ -577,26 +577,26 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (res) {
                 if (res.success) {
-                    showToast('Mesin berhasil dihapus.', 'success');
+                    showToast('Machine deleted successfully.', 'success');
                     $('#deleteMachineModal').modal('hide');
                     setTimeout(function () { location.reload(); }, 800);
                 } else {
-                    showToast('Gagal: ' + (res.message || 'Kesalahan tidak diketahui'), 'error');
-                    $('#btnDeleteMachineConfirm').prop('disabled', false).html('<i class="fas fa-trash mr-1"></i>Hapus');
+                    showToast('Failed: ' + (res.message || 'Unknown error'), 'error');
+                    $('#btnDeleteMachineConfirm').prop('disabled', false).html('<i class="fas fa-trash mr-1"></i>Delete');
                 }
             },
             error: function (xhr) {
-                var msg = 'Terjadi kesalahan server.';
+                var msg = 'A server error occurred.';
                 try { msg = JSON.parse(xhr.responseText).message || msg; } catch(e) {}
                 showToast(msg, 'error');
-                $('#btnDeleteMachineConfirm').prop('disabled', false).html('<i class="fas fa-trash mr-1"></i>Hapus');
+                $('#btnDeleteMachineConfirm').prop('disabled', false).html('<i class="fas fa-trash mr-1"></i>Delete');
             }
         });
     });
 
     // Reset delete btn on close
     $('#deleteMachineModal').on('hidden.bs.modal', function () {
-        $('#btnDeleteMachineConfirm').prop('disabled', false).html('<i class="fas fa-trash mr-1"></i>Hapus');
+        $('#btnDeleteMachineConfirm').prop('disabled', false).html('<i class="fas fa-trash mr-1"></i>Delete');
     });
 
     // ─── TOGGLE STATUS ───────────────────────────────────────────────────────
@@ -615,16 +615,16 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (res) {
                 if (res.success) {
-                    showToast('Status diubah ke ' + newStatus.toUpperCase() + '.', 'success');
+                    showToast('Status changed to ' + newStatus.toUpperCase() + '.', 'success');
                     setTimeout(function () { location.reload(); }, 600);
                 } else {
-                    showToast('Gagal ubah status: ' + (res.message || ''), 'error');
+                    showToast('Failed to change status: ' + (res.message || ''), 'error');
                     btn.prop('disabled', false);
                     btn.find('.fa-spinner').remove();
                 }
             },
             error: function () {
-                showToast('Terjadi kesalahan server.', 'error');
+                showToast('A server error occurred.', 'error');
                 btn.prop('disabled', false);
                 btn.find('.fa-spinner').remove();
             }

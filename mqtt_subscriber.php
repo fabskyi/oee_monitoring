@@ -28,11 +28,11 @@ function logMsg(string $msg): void {
 function getMySQL(): mysqli {
     $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
     if ($mysqli->connect_error) {
-        logMsg("❌ MySQL: " . $mysqli->connect_error);
+        logMsg("MySQL: " . $mysqli->connect_error);
         exit(1);
     }
     $mysqli->set_charset('utf8mb4');
-    logMsg("✅ MySQL connected");
+    logMsg("MySQL connected");
     return $mysqli;
 }
 
@@ -46,10 +46,10 @@ class SimpleMQTT {
     public function connect(string $host, int $port, string $clientId, int $timeout = 10): bool {
         $this->socket = @fsockopen($host, $port, $errno, $errstr, $timeout);
         if (!$this->socket) {
-            logMsg("❌ Socket: $errstr ($errno)");
+            logMsg("Socket: $errstr ($errno)");
             return false;
         }
-        stream_set_timeout($this->socket, 0, 50000);   // 50ms non-blocking read
+        stream_set_timeout($this->socket, 0, 5000);    // 5ms non-blocking read
         stream_set_blocking($this->socket, false);
 
         // MQTT CONNECT packet
@@ -64,15 +64,15 @@ class SimpleMQTT {
         while (strlen($resp) < 4 && time() < $deadline) {
             $chunk = fread($this->socket, 4);
             if ($chunk) $resp .= $chunk;
-            usleep(50000);
+            usleep(5000);
         }
         if (strlen($resp) >= 4 && ord($resp[0]) === 0x20 && ord($resp[3]) === 0) {
             $this->connected = true;
             $this->lastPing  = time();
-            logMsg("✅ MQTT connected → $host:$port");
+            logMsg("MQTT connected → $host:$port");
             return true;
         }
-        logMsg("❌ CONNACK gagal (hex: " . bin2hex(substr($resp,0,4)) . ")");
+        logMsg("CONNACK gagal (hex: " . bin2hex(substr($resp,0,4)) . ")");
         fclose($this->socket);
         $this->socket = null;
         return false;
@@ -82,18 +82,18 @@ class SimpleMQTT {
         $mid     = $this->msgid++;
         $payload = chr($mid >> 8) . chr($mid & 0xFF) . $this->encStr($topic) . chr(0);
         fwrite($this->socket, chr(0x82) . $this->encLen(strlen($payload)) . $payload);
-        usleep(200000);
+        usleep(20000);
         @fread($this->socket, 10); // SUBACK
-        logMsg("✅ Subscribed: $topic");
+        logMsg("Subscribed: $topic");
     }
 
     public function loop(callable $cb): void {
-        logMsg("🔄 Menunggu pesan MQTT...\n");
+        logMsg("Menunggu pesan MQTT...\n");
         while ($this->connected) {
             // Kirim PINGREQ setiap KEEPALIVE/2 detik
             if (time() - $this->lastPing >= (MQTT_KEEPALIVE / 2)) {
                 if (!$this->ping()) {
-                    logMsg("⚠️  PING gagal — putus");
+                    logMsg("PING gagal — putus");
                     $this->connected = false;
                     break;
                 }
@@ -102,11 +102,11 @@ class SimpleMQTT {
 
             $byte = @fread($this->socket, 1);
             if ($byte === false || $byte === '') {
-                usleep(50000);
+                usleep(2000);
                 continue;
             }
             if (feof($this->socket)) {
-                logMsg("⚠️  Socket EOF — putus");
+                logMsg("Socket EOF — putus");
                 $this->connected = false;
                 break;
             }
@@ -117,7 +117,7 @@ class SimpleMQTT {
             $mult = 1; $remain = 0;
             do {
                 $b = @fread($this->socket, 1);
-                if ($b === false || $b === '') { usleep(10000); continue 2; }
+                if ($b === false || $b === '') { usleep(1000); continue 2; }
                 $b       = ord($b);
                 $remain += ($b & 127) * $mult;
                 $mult   *= 128;
@@ -128,7 +128,7 @@ class SimpleMQTT {
             $left = $remain;
             while ($left > 0) {
                 $chunk = @fread($this->socket, $left);
-                if ($chunk === false || $chunk === '') { usleep(5000); continue; }
+                if ($chunk === false || $chunk === '') { usleep(500); continue; }
                 $data .= $chunk;
                 $left -= strlen($chunk);
             }
@@ -170,11 +170,18 @@ class SimpleMQTT {
 function saveToMySQL(mysqli $db, array $data): bool {
     // Auto-reconnect MySQL kalau koneksi putus
     if (!$db->ping()) {
-        logMsg("⚠️  MySQL ping gagal, reconnect...");
+        logMsg("MySQL ping gagal, reconnect...");
         $db->connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
     }
 
     $mid = isset($data['machine_id']) ? (int)$data['machine_id'] : 1;
+
+    // Pastikan machine_id ada di tabel machines (hindari FK error)
+    $check = $db->query("SELECT id FROM machines WHERE id=$mid");
+    if (!$check || $check->num_rows === 0) {
+        logMsg("Machine $mid tidak ada di DB, data dilewati. Gunakan machine_id yang valid.");
+        return false;
+    }
 
     $stmt = $db->prepare("
         INSERT INTO sensor_readings
@@ -183,7 +190,7 @@ function saveToMySQL(mysqli $db, array $data): bool {
              temp_panel, hum_panel, source, recorded_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
     ");
-    if (!$stmt) { logMsg("❌ Prepare: " . $db->error); return false; }
+    if (!$stmt) { logMsg("Prepare: " . $db->error); return false; }
 
     $v_r  = (float)($data['v_r']        ?? 0);
     $v_s  = (float)($data['v_s']        ?? 0);
@@ -207,15 +214,48 @@ function saveToMySQL(mysqli $db, array $data): bool {
     );
 
     if ($stmt->execute()) {
-        logMsg(sprintf("💾 machine=%d | V_R=%.1fV | A_R=%.2fA | Temp=%.1f°C | src=%s",
+        logMsg(sprintf("machine=%d | V_R=%.1fV | A_R=%.2fA | Temp=%.1f°C | src=%s",
             $mid, $v_r, $a_r, $temp, $src));
 
         // Update machine status jadi 'run' saat ada data masuk
         $db->query("UPDATE machines SET status='run', updated_at=NOW() WHERE id=$mid");
         return true;
     }
-    logMsg("❌ Insert: " . $stmt->error);
+    logMsg("Insert: " . $stmt->error);
     return false;
+}
+
+// ── Simpan vibration ke MySQL ─────────────────────────────────
+function saveVibration(mysqli $db, int $mid, array $data): void {
+    // vib_x/y/z/b → sensor_num 1/2/3/4, rms_overall = nilai sensor tsb
+    $axes = [
+        1 => (float)($data['vib_x'] ?? 0),
+        2 => (float)($data['vib_y'] ?? 0),
+        3 => (float)($data['vib_z'] ?? 0),
+        4 => (float)($data['vib_b'] ?? 0),
+    ];
+    $vib_temp = (float)($data['vib_temp'] ?? 0);
+
+    foreach ($axes as $snum => $rms) {
+        $status = 'normal';
+        if ($rms >= 7.1)      $status = 'critical';
+        elseif ($rms >= 2.8)  $status = 'warning';
+
+        $stmt = $db->prepare("
+            INSERT INTO vibration_readings
+                (machine_id, sensor_num, rms_overall, axis_b, temp_sensor, status, source, recorded_at)
+            VALUES (?, ?, ?, ?, ?, ?, 'esp32_mqtt', NOW())
+        ");
+        if (!$stmt) { logMsg("Vib prepare: " . $db->error); continue; }
+
+        $axis_b = ($snum === 4) ? $rms : null;
+        $stmt->bind_param('iiddds', $mid, $snum, $rms, $axis_b, $vib_temp, $status);
+        $stmt->execute();
+    }
+    logMsg(sprintf("vib machine=%d | X=%.2f Y=%.2f Z=%.2f B=%.2f",
+        $mid,
+        $axes[1], $axes[2], $axes[3], $axes[4]
+    ));
 }
 
 // ── Main: loop auto-reconnect ─────────────────────────────────
@@ -235,16 +275,19 @@ while (true) {
     if ($mqtt->connect(MQTT_HOST, MQTT_PORT, $clientId)) {
         $mqtt->subscribe(MQTT_TOPIC);
         $mqtt->loop(function(string $topic, string $payload) use ($mysqli) {
-            logMsg("📩 [$topic]");
+            logMsg("[$topic]");
             $data = json_decode($payload, true);
             if (!is_array($data)) {
-                logMsg("⚠️  JSON invalid: " . substr($payload, 0, 100));
+                logMsg("JSON invalid: " . substr($payload, 0, 100));
                 return;
             }
-            saveToMySQL($mysqli, $data);
+            $mid = isset($data['machine_id']) ? (int)$data['machine_id'] : 0;
+            if (saveToMySQL($mysqli, $data) && $mid > 0) {
+                saveVibration($mysqli, $mid, $data);
+            }
         });
     }
 
-    logMsg("🔄 Reconnect dalam " . RECONNECT_DELAY . " detik...");
+    logMsg("Reconnect dalam " . RECONNECT_DELAY . " detik...");
     sleep(RECONNECT_DELAY);
 }

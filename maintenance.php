@@ -73,7 +73,7 @@ require_once 'includes/header.php';
         <i class="fas fa-wrench mr-2"></i>Maintenance
     </h1>
     <button class="btn btn-primary btn-sm shadow-sm" data-toggle="modal" data-target="#addMaintModal">
-        <i class="fas fa-plus fa-sm text-white-50 mr-1"></i> Tambah Record
+        <i class="fas fa-plus fa-sm text-white-50 mr-1"></i> Add Record
     </button>
 </div>
 
@@ -97,7 +97,7 @@ require_once 'includes/header.php';
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Preventive Bulan Ini</div>
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Preventive This Month</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $statsPrev; ?></div>
                     </div>
                     <div class="col-auto"><i class="fas fa-shield-alt fa-2x text-gray-300"></i></div>
@@ -110,7 +110,7 @@ require_once 'includes/header.php';
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Breakdown Bulan Ini</div>
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Breakdown This Month</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $statsBrkd; ?></div>
                     </div>
                     <div class="col-auto"><i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i></div>
@@ -123,7 +123,7 @@ require_once 'includes/header.php';
             <div class="card-body">
                 <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Rata-rata Durasi (menit)</div>
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Average Duration (minutes)</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo number_format($avgDur, 1); ?></div>
                     </div>
                     <div class="col-auto"><i class="fas fa-clock fa-2x text-gray-300"></i></div>
@@ -139,12 +139,12 @@ require_once 'includes/header.php';
         <ul class="nav nav-tabs card-header-tabs" id="maintTabs" role="tablist">
             <li class="nav-item">
                 <a class="nav-link active" id="table-tab" data-toggle="tab" href="#tabTable" role="tab">
-                    <i class="fas fa-table mr-1"></i> Tabel Riwayat
+                    <i class="fas fa-table mr-1"></i> History Table
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" id="calendar-tab" data-toggle="tab" href="#tabCalendar" role="tab">
-                    <i class="fas fa-calendar-alt mr-1"></i> Kalender
+                    <i class="fas fa-calendar-alt mr-1"></i> Calendar
                 </a>
             </li>
         </ul>
@@ -159,9 +159,9 @@ require_once 'includes/header.php';
                 <form method="GET" class="form-inline mb-3 flex-wrap" id="filterForm">
                     <input type="hidden" name="month" value="<?php echo htmlspecialchars($calMonth); ?>">
                     <div class="form-group mr-2 mb-2">
-                        <label class="mr-1 small">Mesin:</label>
+                        <label class="mr-1 small">Machine:</label>
                         <select name="machine_id" class="form-control form-control-sm">
-                            <option value="">Semua Mesin</option>
+                            <option value="">All Machines</option>
                             <?php foreach ($machines as $m): ?>
                                 <option value="<?php echo $m['id']; ?>" <?php echo $filterMachine == $m['id'] ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($m['name']); ?>
@@ -170,9 +170,9 @@ require_once 'includes/header.php';
                         </select>
                     </div>
                     <div class="form-group mr-2 mb-2">
-                        <label class="mr-1 small">Tipe:</label>
+                        <label class="mr-1 small">Type:</label>
                         <select name="type" class="form-control form-control-sm">
-                            <option value="">Semua Tipe</option>
+                            <option value="">All Types</option>
                             <option value="preventive"  <?php echo $filterType === 'preventive'  ? 'selected' : ''; ?>>Preventive</option>
                             <option value="corrective"  <?php echo $filterType === 'corrective'  ? 'selected' : ''; ?>>Corrective</option>
                             <option value="breakdown"   <?php echo $filterType === 'breakdown'   ? 'selected' : ''; ?>>Breakdown</option>
@@ -180,16 +180,16 @@ require_once 'includes/header.php';
                         </select>
                     </div>
                     <div class="form-group mr-2 mb-2">
-                        <label class="mr-1 small">Dari:</label>
+                        <label class="mr-1 small">From:</label>
                         <input type="date" name="from" class="form-control form-control-sm" value="<?php echo htmlspecialchars($filterFrom ?? ''); ?>">
                     </div>
                     <div class="form-group mr-2 mb-2">
-                        <label class="mr-1 small">Sampai:</label>
+                        <label class="mr-1 small">To:</label>
                         <input type="date" name="to" class="form-control form-control-sm" value="<?php echo htmlspecialchars($filterTo ?? ''); ?>">
                     </div>
                     <div class="mb-2">
                         <button type="submit" class="btn btn-primary btn-sm mr-1"><i class="fas fa-filter mr-1"></i>Filter</button>
-                        <a href="maintenance.php" class="btn btn-secondary btn-sm"><i class="fas fa-times mr-1"></i>Reset</a>
+                        <a href="maintenance.php" class="btn btn-secondary btn-sm"><i class="fas fa-times mr-1"></i>Clear</a>
                     </div>
                 </form>
 
@@ -198,14 +198,14 @@ require_once 'includes/header.php';
                     <table class="table table-bordered table-hover" id="mainTable" width="100%" cellspacing="0">
                         <thead class="thead-light">
                             <tr>
-                                <th>Tanggal</th>
-                                <th>Mesin</th>
-                                <th>Tipe</th>
-                                <th>Deskripsi</th>
-                                <th>Teknisi</th>
-                                <th>Durasi</th>
-                                <th>Biaya</th>
-                                <th>Aksi</th>
+                                <th>Date</th>
+                                <th>Machine</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Technician</th>
+                                <th>Duration</th>
+                                <th>Cost</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -227,7 +227,7 @@ require_once 'includes/header.php';
                                 </td>
                                 <td><?php echo htmlspecialchars($row['description']); ?></td>
                                 <td><?php echo htmlspecialchars($row['technician']); ?></td>
-                                <td><?php echo $row['duration_min'] !== null ? htmlspecialchars($row['duration_min']) . ' mnt' : '-'; ?></td>
+                                <td><?php echo $row['duration_min'] !== null ? htmlspecialchars($row['duration_min']) . ' min' : '-'; ?></td>
                                 <td><?php echo $row['cost'] !== null ? 'Rp ' . number_format((float)$row['cost'], 0, ',', '.') : '-'; ?></td>
                                 <td class="text-center" style="white-space:nowrap;">
                                     <button class="btn btn-warning btn-sm btn-edit"
@@ -238,7 +238,7 @@ require_once 'includes/header.php';
                                     <button class="btn btn-danger btn-sm btn-delete"
                                         data-id="<?php echo $row['id']; ?>"
                                         data-name="<?php echo htmlspecialchars($row['machine_name'] . ' - ' . $row['maint_date']); ?>"
-                                        title="Hapus">
+                                        title="Delete">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -302,7 +302,7 @@ require_once 'includes/header.php';
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addMaintModalLabel"><i class="fas fa-plus mr-1"></i> Tambah Record Maintenance</h5>
+                <h5 class="modal-title" id="addMaintModalLabel"><i class="fas fa-plus mr-1"></i> Add Maintenance Record</h5>
                 <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
             </div>
             <div class="modal-body">
@@ -310,9 +310,9 @@ require_once 'includes/header.php';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Mesin <span class="text-danger">*</span></label>
+                                <label>Machine <span class="text-danger">*</span></label>
                                 <select name="machine_id" id="add_machine_id" class="form-control" required>
-                                    <option value="">-- Pilih Mesin --</option>
+                                    <option value="">-- Select Machine --</option>
                                     <?php foreach ($machines as $m): ?>
                                         <option value="<?php echo $m['id']; ?>"><?php echo htmlspecialchars($m['name']); ?></option>
                                     <?php endforeach; ?>
@@ -321,9 +321,9 @@ require_once 'includes/header.php';
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Tipe <span class="text-danger">*</span></label>
+                                <label>Type <span class="text-danger">*</span></label>
                                 <select name="type" id="add_type" class="form-control" required>
-                                    <option value="">-- Pilih Tipe --</option>
+                                    <option value="">-- Select Type --</option>
                                     <option value="preventive">Preventive</option>
                                     <option value="corrective">Corrective</option>
                                     <option value="breakdown">Breakdown</option>
@@ -333,31 +333,31 @@ require_once 'includes/header.php';
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                                <label>Deskripsi <span class="text-danger">*</span></label>
+                                <label>Description <span class="text-danger">*</span></label>
                                 <textarea name="description" id="add_description" class="form-control" rows="3" required></textarea>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Teknisi <span class="text-danger">*</span></label>
+                                <label>Technician <span class="text-danger">*</span></label>
                                 <input type="text" name="technician" id="add_technician" class="form-control" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Tanggal Maintenance <span class="text-danger">*</span></label>
+                                <label>Maintenance Date <span class="text-danger">*</span></label>
                                 <input type="date" name="maint_date" id="add_maint_date" class="form-control" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Durasi (menit)</label>
+                                <label>Duration (minutes)</label>
                                 <input type="number" name="duration_min" id="add_duration_min" class="form-control" min="0">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Biaya (Rp)</label>
+                                <label>Cost (Rp)</label>
                                 <input type="number" name="cost" id="add_cost" class="form-control" min="0" step="0.01">
                             </div>
                         </div>
@@ -365,8 +365,8 @@ require_once 'includes/header.php';
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-primary" id="btnAddSave"><i class="fas fa-save mr-1"></i> Simpan</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="btnAddSave"><i class="fas fa-save mr-1"></i> Save</button>
             </div>
         </div>
     </div>
@@ -377,7 +377,7 @@ require_once 'includes/header.php';
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editMaintModalLabel"><i class="fas fa-edit mr-1"></i> Edit Record Maintenance</h5>
+                <h5 class="modal-title" id="editMaintModalLabel"><i class="fas fa-edit mr-1"></i> Edit Maintenance Record</h5>
                 <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
             </div>
             <div class="modal-body">
@@ -386,9 +386,9 @@ require_once 'includes/header.php';
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Mesin <span class="text-danger">*</span></label>
+                                <label>Machine <span class="text-danger">*</span></label>
                                 <select name="machine_id" id="edit_machine_id" class="form-control" required>
-                                    <option value="">-- Pilih Mesin --</option>
+                                    <option value="">-- Select Machine --</option>
                                     <?php foreach ($machines as $m): ?>
                                         <option value="<?php echo $m['id']; ?>"><?php echo htmlspecialchars($m['name']); ?></option>
                                     <?php endforeach; ?>
@@ -397,9 +397,9 @@ require_once 'includes/header.php';
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Tipe <span class="text-danger">*</span></label>
+                                <label>Type <span class="text-danger">*</span></label>
                                 <select name="type" id="edit_type" class="form-control" required>
-                                    <option value="">-- Pilih Tipe --</option>
+                                    <option value="">-- Select Type --</option>
                                     <option value="preventive">Preventive</option>
                                     <option value="corrective">Corrective</option>
                                     <option value="breakdown">Breakdown</option>
@@ -409,31 +409,31 @@ require_once 'includes/header.php';
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                                <label>Deskripsi <span class="text-danger">*</span></label>
+                                <label>Description <span class="text-danger">*</span></label>
                                 <textarea name="description" id="edit_description" class="form-control" rows="3" required></textarea>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Teknisi <span class="text-danger">*</span></label>
+                                <label>Technician <span class="text-danger">*</span></label>
                                 <input type="text" name="technician" id="edit_technician" class="form-control" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Tanggal Maintenance <span class="text-danger">*</span></label>
+                                <label>Maintenance Date <span class="text-danger">*</span></label>
                                 <input type="date" name="maint_date" id="edit_maint_date" class="form-control" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Durasi (menit)</label>
+                                <label>Duration (minutes)</label>
                                 <input type="number" name="duration_min" id="edit_duration_min" class="form-control" min="0">
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Biaya (Rp)</label>
+                                <label>Cost (Rp)</label>
                                 <input type="number" name="cost" id="edit_cost" class="form-control" min="0" step="0.01">
                             </div>
                         </div>
@@ -441,8 +441,8 @@ require_once 'includes/header.php';
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-primary" id="btnEditSave"><i class="fas fa-save mr-1"></i> Simpan</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="btnEditSave"><i class="fas fa-save mr-1"></i> Save</button>
             </div>
         </div>
     </div>
@@ -453,17 +453,17 @@ require_once 'includes/header.php';
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="fas fa-trash mr-1 text-danger"></i> Hapus Record</h5>
+                <h5 class="modal-title"><i class="fas fa-trash mr-1 text-danger"></i> Delete Record</h5>
                 <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
             </div>
             <div class="modal-body">
-                <p>Yakin ingin menghapus record: <strong id="deleteRecordName"></strong>?</p>
-                <p class="text-danger small">Tindakan ini tidak dapat dibatalkan.</p>
+                <p>Are you sure you want to delete the record: <strong id="deleteRecordName"></strong>?</p>
+                <p class="text-danger small">This action cannot be undone.</p>
                 <input type="hidden" id="deleteRecordId">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-danger" id="btnDeleteConfirm"><i class="fas fa-trash mr-1"></i> Hapus</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="btnDeleteConfirm"><i class="fas fa-trash mr-1"></i> Delete</button>
             </div>
         </div>
     </div>
@@ -555,7 +555,7 @@ $(document).ready(function () {
 
     // --- ADD: save ---
     $('#btnAddSave').on('click', function () {
-        var $btn = $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...');
+        var $btn = $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Saving...');
         var data = {
             action:       'create',
             machine_id:   $('#add_machine_id').val(),
@@ -567,8 +567,8 @@ $(document).ready(function () {
             cost:         $('#add_cost').val()
         };
         if (!data.machine_id || !data.type || !data.description || !data.technician || !data.maint_date) {
-            showToast('Peringatan', 'Semua field wajib harus diisi.', 'warning');
-            $btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Simpan');
+            showToast('Warning', 'All required fields must be filled in.', 'warning');
+            $btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Save');
             return;
         }
         $.ajax({
@@ -578,18 +578,18 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (res) {
                 if (res.success) {
-                    showToast('Berhasil', 'Record berhasil ditambahkan.', 'success');
+                    showToast('Success', 'Record added successfully.', 'success');
                     $('#addMaintModal').modal('hide');
                     $('#addMaintForm')[0].reset();
                     setTimeout(function () { location.reload(); }, 1200);
                 } else {
-                    showToast('Gagal', res.message || 'Terjadi kesalahan.', 'error');
-                    $btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Simpan');
+                    showToast('Failed', res.message || 'An error occurred.', 'error');
+                    $btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Save');
                 }
             },
             error: function () {
-                showToast('Error', 'Tidak dapat terhubung ke server.', 'error');
-                $btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Simpan');
+                showToast('Error', 'Unable to connect to server.', 'error');
+                $btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Save');
             }
         });
     });
@@ -610,16 +610,16 @@ $(document).ready(function () {
                 $('#edit_cost').val(d.cost !== null && d.cost !== undefined ? d.cost : '');
                 $('#editMaintModal').modal('show');
             } else {
-                showToast('Error', res.message || 'Data tidak ditemukan.', 'error');
+                showToast('Error', res.message || 'Data not found.', 'error');
             }
         }, 'json').fail(function () {
-            showToast('Error', 'Tidak dapat mengambil data.', 'error');
+            showToast('Error', 'Unable to retrieve data.', 'error');
         });
     });
 
     // --- EDIT: save ---
     $('#btnEditSave').on('click', function () {
-        var $btn = $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Menyimpan...');
+        var $btn = $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Saving...');
         var data = {
             action:       'update',
             id:           $('#edit_id').val(),
@@ -632,8 +632,8 @@ $(document).ready(function () {
             cost:         $('#edit_cost').val()
         };
         if (!data.machine_id || !data.type || !data.description || !data.technician || !data.maint_date) {
-            showToast('Peringatan', 'Semua field wajib harus diisi.', 'warning');
-            $btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Simpan');
+            showToast('Warning', 'All required fields must be filled in.', 'warning');
+            $btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Save');
             return;
         }
         $.ajax({
@@ -643,17 +643,17 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (res) {
                 if (res.success) {
-                    showToast('Berhasil', 'Record berhasil diperbarui.', 'success');
+                    showToast('Success', 'Record updated successfully.', 'success');
                     $('#editMaintModal').modal('hide');
                     setTimeout(function () { location.reload(); }, 1200);
                 } else {
-                    showToast('Gagal', res.message || 'Terjadi kesalahan.', 'error');
-                    $btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Simpan');
+                    showToast('Failed', res.message || 'An error occurred.', 'error');
+                    $btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Save');
                 }
             },
             error: function () {
-                showToast('Error', 'Tidak dapat terhubung ke server.', 'error');
-                $btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Simpan');
+                showToast('Error', 'Unable to connect to server.', 'error');
+                $btn.prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Save');
             }
         });
     });
@@ -669,7 +669,7 @@ $(document).ready(function () {
 
     // --- DELETE: confirm ---
     $('#btnDeleteConfirm').on('click', function () {
-        var $btn = $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Menghapus...');
+        var $btn = $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-1"></i> Deleting...');
         var id = $('#deleteRecordId').val();
         $.ajax({
             url: 'api/maintenance.php?action=delete',
@@ -678,17 +678,17 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (res) {
                 if (res.success) {
-                    showToast('Berhasil', 'Record berhasil dihapus.', 'success');
+                    showToast('Success', 'Record deleted successfully.', 'success');
                     $('#deleteMaintModal').modal('hide');
                     setTimeout(function () { location.reload(); }, 1200);
                 } else {
-                    showToast('Gagal', res.message || 'Terjadi kesalahan.', 'error');
-                    $btn.prop('disabled', false).html('<i class="fas fa-trash mr-1"></i> Hapus');
+                    showToast('Failed', res.message || 'An error occurred.', 'error');
+                    $btn.prop('disabled', false).html('<i class="fas fa-trash mr-1"></i> Delete');
                 }
             },
             error: function () {
-                showToast('Error', 'Tidak dapat terhubung ke server.', 'error');
-                $btn.prop('disabled', false).html('<i class="fas fa-trash mr-1"></i> Hapus');
+                showToast('Error', 'Unable to connect to server.', 'error');
+                $btn.prop('disabled', false).html('<i class="fas fa-trash mr-1"></i> Delete');
             }
         });
     });
@@ -696,13 +696,13 @@ $(document).ready(function () {
     // --- Reset buttons on modal open ---
     $('#addMaintModal').on('show.bs.modal', function () {
         $('#addMaintForm')[0].reset();
-        $('#btnAddSave').prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Simpan');
+        $('#btnAddSave').prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Save');
     });
     $('#editMaintModal').on('show.bs.modal', function () {
-        $('#btnEditSave').prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Simpan');
+        $('#btnEditSave').prop('disabled', false).html('<i class="fas fa-save mr-1"></i> Save');
     });
     $('#deleteMaintModal').on('show.bs.modal', function () {
-        $('#btnDeleteConfirm').prop('disabled', false).html('<i class="fas fa-trash mr-1"></i> Hapus');
+        $('#btnDeleteConfirm').prop('disabled', false).html('<i class="fas fa-trash mr-1"></i> Delete');
     });
 
     // =====================
@@ -714,9 +714,9 @@ $(document).ready(function () {
         'breakdown':  '#e74a3b',
         'inspection': '#36b9cc'
     };
-    var MONTH_NAMES = ['Januari','Februari','Maret','April','Mei','Juni',
-                       'Juli','Agustus','September','Oktober','November','Desember'];
-    var DAY_NAMES   = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+    var MONTH_NAMES = ['January','February','March','April','May','June',
+                       'July','August','September','October','November','December'];
+    var DAY_NAMES   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
     function buildCalendar() {
         var parts  = calMonthStr.split('-');
@@ -793,10 +793,10 @@ $(document).ready(function () {
         var typeName = ev.type ? (ev.type.charAt(0).toUpperCase() + ev.type.slice(1)) : '';
         $('#calDetailTitle').text(typeName + ' - ' + ev.machine_name);
         var html = '<table class="table table-sm table-borderless mb-0">'
-            + '<tr><th class="pl-0" style="width:100px">Tanggal</th><td>' + $('<span>').text(ev.maint_date).html() + '</td></tr>'
-            + '<tr><th class="pl-0">Mesin</th><td>' + $('<span>').text(ev.machine_name).html() + '</td></tr>'
-            + '<tr><th class="pl-0">Tipe</th><td>' + $('<span>').text(typeName).html() + '</td></tr>'
-            + '<tr><th class="pl-0">Deskripsi</th><td>' + $('<span>').text(ev.description).html() + '</td></tr>'
+            + '<tr><th class="pl-0" style="width:100px">Date</th><td>' + $('<span>').text(ev.maint_date).html() + '</td></tr>'
+            + '<tr><th class="pl-0">Machine</th><td>' + $('<span>').text(ev.machine_name).html() + '</td></tr>'
+            + '<tr><th class="pl-0">Type</th><td>' + $('<span>').text(typeName).html() + '</td></tr>'
+            + '<tr><th class="pl-0">Description</th><td>' + $('<span>').text(ev.description).html() + '</td></tr>'
             + '</table>';
         $('#calDetailBody').html(html);
         $('#calDetail').removeClass('d-none');
